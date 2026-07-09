@@ -15,7 +15,8 @@ export default function AdriaticPadelPortfolioPage() {
     description: 'A dynamic website for a modern padel center in Trogir, bringing the fastest-growing sport to Croatia.',
     category: 'Sports & Recreation',
     color: 'from-blue-500 to-cyan-500',
-    image: '/images/portfolio/adriaticpadelklub.png',
+    image: '/images/portfolio/adriaticpadelklub.webp',
+    liveUrl: 'https://adriaticpadelklub.hr',
     features: [
       {
         title: 'Court Booking',
@@ -59,15 +60,15 @@ export default function AdriaticPadelPortfolioPage() {
 
   return (
     <main className="bg-white">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioHero project={projectData} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateFeaturesSection features={projectData.features} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioCTASection projectName={projectData.name} color={projectData.color} />
       </Suspense>
     </main>

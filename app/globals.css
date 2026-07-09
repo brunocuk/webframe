@@ -40,9 +40,8 @@
     @apply border-gray-200;
   }
   
-  html {
-    @apply scroll-smooth;
-  }
+  /* Smooth scrolling is handled by Lenis (components/SmoothScroll.jsx);
+     native scroll-smooth would fight it */
   
   body {
     @apply bg-white text-gray-900 antialiased;

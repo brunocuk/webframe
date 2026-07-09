@@ -15,7 +15,8 @@ export default function HabuPortfolioPage() {
     description: 'A professional website for a modern business building offering serviced offices and coworking spaces in Split.',
     category: 'Business & Real Estate',
     color: 'from-slate-600 to-slate-800',
-    image: '/images/portfolio/habu.png',
+    image: '/images/portfolio/habu.webp',
+    liveUrl: null, // TODO: add live URL when available
     features: [
       {
         title: 'Space Showcase',
@@ -59,15 +60,15 @@ export default function HabuPortfolioPage() {
 
   return (
     <main className="bg-white">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioHero project={projectData} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateFeaturesSection features={projectData.features} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioCTASection projectName={projectData.name} color={projectData.color} />
       </Suspense>
     </main>

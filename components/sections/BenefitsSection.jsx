@@ -57,7 +57,7 @@ export default function BenefitsSection() {
     },
     {
       title: 'Transparent Pricing',
-      description: 'You know exactly what you\'re paying upfront. No hidden costs, no monthly fees for "premium features", no surprises.',
+      description: 'You know exactly what you\'re paying upfront. No hidden costs, no forced subscriptions for "premium features" — ongoing maintenance is optional.',
       icon: (
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2V22M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -102,7 +102,7 @@ export default function BenefitsSection() {
   }
 
   return (
-    <section className="py-32 px-6 bg-white relative overflow-hidden">
+    <section className="py-24 px-6 bg-white relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-20 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
@@ -114,7 +114,7 @@ export default function BenefitsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -131,7 +131,7 @@ export default function BenefitsSection() {
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Wix, Webflow, and Framer are great for DIY. We build professional sites with custom code,
-            without limitations and without monthly fees.
+            without limitations and without platform subscription fees.
           </p>
         </motion.div>
 
@@ -183,7 +183,6 @@ export default function BenefitsSection() {
                   </div>
 
                   {/* Corner decoration */}
-                  <div className="absolute top-4 right-4 w-8 h-8 border-2 border-gray-200 rounded-full opacity-50 group-hover:border-primary/50 transition-colors" />
                 </div>
 
                 {/* Card shadow/glow */}

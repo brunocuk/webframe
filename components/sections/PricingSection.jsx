@@ -100,7 +100,7 @@ export default function PricingSection() {
   }
 
   return (
-    <section id="pricing" className="py-32 px-6 bg-white relative overflow-hidden">
+    <section id="pricing" className="py-24 px-6 bg-white relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-10 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
@@ -218,7 +218,7 @@ export default function PricingSection() {
                             </span>
                           </div>
                           <div className="mt-2 text-gray-600 text-sm">
-                            + €{plan.maintenanceFee}/month maintenance
+                            + optional €{plan.maintenanceFee}/month maintenance
                           </div>
                         </div>
                       ) : (
@@ -281,8 +281,6 @@ export default function PricingSection() {
                   </div>
 
                   {/* Corner decoration */}
-                  <div className="absolute top-4 right-4 w-16 h-16 border-2 border-gray-200 rounded-full opacity-50" />
-                  <div className="absolute bottom-4 left-4 w-10 h-10 border-2 border-gray-200 rounded-full opacity-50" />
                 </div>
 
                 {/* Card shadow/glow */}

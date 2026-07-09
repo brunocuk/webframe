@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null)
@@ -16,7 +17,7 @@ export default function PortfolioSection() {
       slug: 'studio-one',
       description: 'Premium hair salon delivering beauty and confidence through expert styling and keratin treatments',
       category: 'Beauty & Wellness',
-      bgImage: '/images/portfolio/studioonebynina.png',
+      bgImage: '/images/portfolio/studioonebynina.webp',
       primaryColor: 'from-amber-600 to-yellow-500',
     },
     {
@@ -25,7 +26,7 @@ export default function PortfolioSection() {
       slug: 'cheese-bar',
       description: 'Artisan cheese and Croatian wine bar in the heart of Zagreb',
       category: 'Food & Hospitality',
-      bgImage: '/images/portfolio/cheesebar.png',
+      bgImage: '/images/portfolio/cheesebar.webp',
       primaryColor: 'from-amber-500 to-orange-500',
     },
     {
@@ -34,7 +35,7 @@ export default function PortfolioSection() {
       slug: 'adriatic-padel',
       description: 'Modern padel center bringing the fastest-growing sport to the Adriatic coast in Trogir',
       category: 'Sports & Recreation',
-      bgImage: '/images/portfolio/adriaticpadelklub.png',
+      bgImage: '/images/portfolio/adriaticpadelklub.webp',
       primaryColor: 'from-blue-500 to-cyan-500',
     },
     {
@@ -43,7 +44,7 @@ export default function PortfolioSection() {
       slug: 'habu',
       description: 'Premium serviced office spaces and coworking in the heart of Split',
       category: 'Business & Real Estate',
-      bgImage: '/images/portfolio/habu.png',
+      bgImage: '/images/portfolio/habu.webp',
       primaryColor: 'from-slate-600 to-slate-800',
     },
     {
@@ -52,7 +53,7 @@ export default function PortfolioSection() {
       slug: 'cetrnajstica',
       description: 'Authentic Neapolitan pizza restaurant serving Zagreb\'s finest wood-fired pies',
       category: 'Food & Hospitality',
-      bgImage: '/images/portfolio/cetrnajstica.png',
+      bgImage: '/images/portfolio/cetrnajstica.webp',
       primaryColor: 'from-red-500 to-orange-500',
     },
     {
@@ -61,7 +62,7 @@ export default function PortfolioSection() {
       slug: 'matermag',
       description: 'Digital magazine empowering modern mothers with lifestyle, health, and parenting content',
       category: 'Media & Publishing',
-      bgImage: '/images/portfolio/matermag.png',
+      bgImage: '/images/portfolio/matermag.webp',
       primaryColor: 'from-pink-500 to-rose-400',
     },
   ]
@@ -109,16 +110,36 @@ export default function PortfolioSection() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isMobile])
 
-  // Auto-slide on mobile
+  // Auto-slide on mobile (paused once the user swipes)
+  const [userInteracted, setUserInteracted] = useState(false)
+  const touchStartX = useRef(null)
+
   useEffect(() => {
-    if (!isMobile) return
+    if (!isMobile || userInteracted) return
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % projects.length)
     }, 4000)
 
     return () => clearInterval(interval)
-  }, [isMobile, projects.length])
+  }, [isMobile, userInteracted, projects.length])
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return
+    const delta = e.changedTouches[0].clientX - touchStartX.current
+    touchStartX.current = null
+    if (Math.abs(delta) < 40) return
+    setUserInteracted(true)
+    setCurrentSlide((prev) =>
+      delta < 0
+        ? (prev + 1) % projects.length
+        : (prev - 1 + projects.length) % projects.length
+    )
+  }
 
   // Calculate height needed for horizontal scroll
   const scrollHeight = `${300}vh` // 3x viewport height for smooth scroll
@@ -142,13 +163,15 @@ export default function PortfolioSection() {
               >
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${project.bgImage})`,
-                    }}
+                  <Image
+                    src={project.bgImage}
+                    alt={`${project.name} — ${project.category} website by Webframe`}
+                    fill
+                    sizes="70vw"
+                    className="object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/80" />
+                  <div className="absolute inset-0 bg-black/30" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20" />
                   <div className={`absolute inset-0 bg-gradient-to-br ${project.primaryColor} opacity-20 mix-blend-overlay`} />
                 </div>
 
@@ -260,7 +283,11 @@ export default function PortfolioSection() {
 
         {/* Carousel */}
         <div className="relative">
-          <div className="relative h-[500px] rounded-3xl overflow-hidden">
+          <div
+            className="relative h-[500px] rounded-3xl overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             {projects.map((project, index) => (
               <motion.div
                 key={project.id}
@@ -275,13 +302,15 @@ export default function PortfolioSection() {
               >
                 {/* Background */}
                 <div className="absolute inset-0">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${project.bgImage})`,
-                    }}
+                  <Image
+                    src={project.bgImage}
+                    alt={`${project.name} — ${project.category} website by Webframe`}
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-black/80" />
+                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
                   <div className={`absolute inset-0 bg-gradient-to-br ${project.primaryColor} opacity-20 mix-blend-overlay`} />
                 </div>
 
@@ -301,15 +330,35 @@ export default function PortfolioSection() {
                       {project.description}
                     </p>
 
-                    <button className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-semibold">
-                      View
+                    <Link
+                      href={`/portfolio/${project.slug}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-semibold"
+                    >
+                      View Case Study
                       <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
+            ))}
+          </div>
+
+          {/* Slide indicators */}
+          <div className="flex justify-center gap-2 mt-6">
+            {projects.map((project, index) => (
+              <button
+                key={project.id}
+                onClick={() => {
+                  setUserInteracted(true)
+                  setCurrentSlide(index)
+                }}
+                aria-label={`Go to slide ${index + 1}: ${project.name}`}
+                className={`h-2 rounded-full transition-all ${
+                  currentSlide === index ? 'w-6 bg-white' : 'w-2 bg-white/30'
+                }`}
+              />
             ))}
           </div>
         </div>

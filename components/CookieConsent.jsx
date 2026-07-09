@@ -107,72 +107,46 @@ export default function CookieConsent() {
     <AnimatePresence>
       {showBanner && (
         <>
-          {/* Backdrop */}
+          {/* Banner — compact corner card, never blocks the page */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100]"
-            onClick={() => !showSettings && handleRejectAll()}
-          />
-
-          {/* Banner */}
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
+            exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-[101] p-4 md:p-6"
+            className="fixed bottom-4 left-4 right-4 sm:right-auto sm:bottom-6 sm:left-6 sm:max-w-sm z-[100]"
           >
-            <div className="max-w-6xl mx-auto">
+            <div>
               {!showSettings ? (
                 // Main Banner
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 md:p-8">
-                  <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-                    {/* Icon */}
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V13H11V7ZM11 15H13V17H11V15Z" fill="currentColor"/>
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        We Use Cookies
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-4">
-                        We use cookies to improve your experience on our site.
-                        By consenting to cookies, you allow us to analyse traffic and personalise content.
-                      </p>
-                      <Link href="/cookies-policy" className="text-primary hover:underline text-sm font-medium">
-                        Learn more about cookies
-                      </Link>
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                      <button
-                        onClick={() => setShowSettings(true)}
-                        className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors whitespace-nowrap"
-                      >
-                        Customise
-                      </button>
-                      <button
-                        onClick={handleRejectAll}
-                        className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors whitespace-nowrap"
-                      >
-                        Reject All
-                      </button>
-                      <button
-                        onClick={handleAcceptAll}
-                        className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap"
-                      >
-                        Accept All
-                      </button>
-                    </div>
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 p-5">
+                  <h3 className="text-base font-bold text-gray-900 mb-1.5">
+                    We Use Cookies
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-3">
+                    We use cookies to analyse traffic and improve your experience.{' '}
+                    <Link href="/cookies-policy" className="text-primary hover:underline font-medium">
+                      Learn more
+                    </Link>
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={handleAcceptAll}
+                      className="px-4 py-2 bg-primary text-white rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors"
+                    >
+                      Accept All
+                    </button>
+                    <button
+                      onClick={handleRejectAll}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
+                    >
+                      Reject All
+                    </button>
+                    <button
+                      onClick={() => setShowSettings(true)}
+                      className="px-2 py-2 text-gray-500 hover:text-gray-800 font-medium text-sm transition-colors"
+                    >
+                      Customise
+                    </button>
                   </div>
                 </div>
               ) : (

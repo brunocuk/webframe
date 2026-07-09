@@ -15,7 +15,8 @@ export default function StudioOnePortfolioPage() {
     description: 'A sophisticated website for a premium hair salon specializing in Cocochoco keratin treatments and Brendia Pro extensions.',
     category: 'Beauty & Wellness',
     color: 'from-amber-600 to-yellow-500',
-    image: '/images/portfolio/studioonebynina.png',
+    image: '/images/portfolio/studioonebynina.webp',
+    liveUrl: 'https://studioonebynina.hr',
     features: [
       {
         title: 'Elegant Design',
@@ -59,15 +60,15 @@ export default function StudioOnePortfolioPage() {
 
   return (
     <main className="bg-white">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioHero project={projectData} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateFeaturesSection features={projectData.features} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioCTASection projectName={projectData.name} color={projectData.color} />
       </Suspense>
     </main>

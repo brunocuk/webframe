@@ -14,7 +14,7 @@ export default function HomePage() {
         <HeroSection />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <BenefitsSection />
       </Suspense>
       

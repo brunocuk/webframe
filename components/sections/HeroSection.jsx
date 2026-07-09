@@ -2,6 +2,8 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useEffect, useState, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useContactModal } from '../ContactModalProvider'
 
 export default function HeroSection() {
@@ -27,24 +29,27 @@ export default function HeroSection() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  // Portfolio cards data
+  // Real client work shown in the hero stack
   const projects = [
     {
       id: 1,
-      name: 'Tech',
-      color: 'from-blue-500/20 to-cyan-500/20',
+      name: 'Adriatic Padel',
+      slug: 'adriatic-padel',
+      image: '/images/portfolio/adriaticpadelklub.webp',
       position: { x: 100, y: -50, rotate: -8 }
     },
     {
       id: 2,
-      name: 'Business',
-      color: 'from-indigo-500/20 to-purple-500/20',
+      name: 'Studio One',
+      slug: 'studio-one',
+      image: '/images/portfolio/studioonebynina.webp',
       position: { x: 50, y: 0, rotate: 4 }
     },
     {
       id: 3,
-      name: 'Creative',
-      color: 'from-pink-500/20 to-rose-500/20',
+      name: 'Cheese Bar',
+      slug: 'cheese-bar',
+      image: '/images/portfolio/cheesebar.webp',
       position: { x: 150, y: 50, rotate: -6 }
     },
   ]
@@ -99,58 +104,42 @@ export default function HeroSection() {
               transformStyle: 'preserve-3d',
             }}
           >
-            {/* Card */}
-            <div className="w-full h-full relative group cursor-pointer">
-              {/* Glass effect */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${project.color} backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden`}>
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                {/* Mock browser chrome */}
-                <div className="absolute top-0 left-0 right-0 h-8 bg-white/10 backdrop-blur-sm border-b border-white/10 flex items-center px-4 gap-2">
-                  <div className="w-2 h-2 rounded-full bg-red-400/60" />
-                  <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-                  <div className="w-2 h-2 rounded-full bg-green-400/60" />
+            {/* Card — links to its case study */}
+            <Link
+              href={`/portfolio/${project.slug}`}
+              aria-label={`View the ${project.name} case study`}
+              className="block w-full h-full relative pointer-events-auto cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-white rounded-3xl border border-gray-200/80 shadow-2xl overflow-hidden">
+                {/* Browser chrome */}
+                <div className="absolute top-0 left-0 right-0 h-8 bg-gray-50 border-b border-gray-100 flex items-center px-4 gap-2 z-10">
+                  <div className="w-2 h-2 rounded-full bg-red-400/70" />
+                  <div className="w-2 h-2 rounded-full bg-yellow-400/70" />
+                  <div className="w-2 h-2 rounded-full bg-green-400/70" />
                 </div>
 
-                {/* Mock content */}
-                <div className="absolute top-12 left-6 right-6 space-y-3">
-                  {/* Header bar */}
-                  <div className="h-3 bg-white/30 rounded-full w-1/2" />
-
-                  {/* Content blocks */}
-                  <div className="space-y-2 mt-6">
-                    <div className="h-2 bg-white/20 rounded-full w-full" />
-                    <div className="h-2 bg-white/20 rounded-full w-4/5" />
-                    <div className="h-2 bg-white/20 rounded-full w-3/5" />
-                  </div>
-
-                  {/* Image placeholder */}
-                  <div className="mt-6 h-32 bg-white/20 rounded-2xl" />
-
-                  {/* More content */}
-                  <div className="space-y-2 mt-4">
-                    <div className="h-2 bg-white/20 rounded-full w-full" />
-                    <div className="h-2 bg-white/20 rounded-full w-5/6" />
-                  </div>
+                {/* Real project screenshot */}
+                <div className="absolute top-8 left-0 right-0 bottom-0">
+                  <Image
+                    src={project.image}
+                    alt={`${project.name} — website built by Webframe`}
+                    fill
+                    sizes="400px"
+                    className="object-cover object-top"
+                  />
                 </div>
 
                 {/* Badge */}
-                <div className="absolute bottom-6 left-6">
-                  <div className="px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-900">
+                <div className="absolute bottom-6 left-6 z-10">
+                  <div className="px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-900 shadow-md">
                     {project.name}
                   </div>
-                </div>
-
-                {/* Hover glow */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${project.color.replace('/20', '/40')} blur-2xl`} />
                 </div>
               </div>
 
               {/* Shadow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 blur-3xl -z-10 opacity-50 group-hover:opacity-80 transition-opacity" />
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 blur-3xl -z-10 opacity-50" />
+            </Link>
           </motion.div>
         ))}
 
@@ -230,8 +219,8 @@ export default function HeroSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl leading-relaxed"
           >
-            Tell us your vision, we build it custom.
-            Professional. Fast. Tailored to you.
+            No templates, no page builders. A hand-coded website
+            built around your business — live within a week.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -354,21 +343,6 @@ export default function HeroSection() {
           />
         </motion.div>
       </motion.div>
-
-      {/* Floating CTA */}
-      <motion.button
-        onClick={openModal}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 1.2 }}
-        whileHover={{ scale: 1.05 }}
-        className="fixed bottom-8 right-8 z-40 hidden lg:flex items-center gap-2 px-6 py-3 bg-white/80 backdrop-blur-xl shadow-xl shadow-primary/10 rounded-full font-semibold text-sm border border-gray-200 hover:border-primary/50 transition-all cursor-pointer"
-      >
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        Start Your Project
-      </motion.button>
     </section>
   )
 }

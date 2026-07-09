@@ -15,7 +15,8 @@ export default function MatermagPortfolioPage() {
     description: 'A vibrant digital magazine platform empowering modern mothers with lifestyle, health, and parenting content.',
     category: 'Media & Publishing',
     color: 'from-pink-500 to-rose-400',
-    image: '/images/portfolio/matermag.png',
+    image: '/images/portfolio/matermag.webp',
+    liveUrl: 'https://matermag.hr',
     features: [
       {
         title: 'Editorial Layout',
@@ -58,15 +59,15 @@ export default function MatermagPortfolioPage() {
 
   return (
     <main className="bg-white">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioHero project={projectData} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateFeaturesSection features={projectData.features} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioCTASection projectName={projectData.name} color={projectData.color} />
       </Suspense>
     </main>

@@ -86,7 +86,7 @@ export default function HowItWorksSection() {
   }
 
   return (
-    <section id="process" className="py-32 px-6 bg-gradient-to-br from-gray-50 via-white to-purple-50/30 relative overflow-hidden">
+    <section id="process" className="py-24 px-6 bg-gradient-to-br from-gray-50 via-white to-purple-50/30 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
@@ -98,7 +98,7 @@ export default function HowItWorksSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -190,8 +190,6 @@ export default function HowItWorksSection() {
                   </div>
 
                   {/* Corner decoration */}
-                  <div className="absolute top-4 right-4 w-12 h-12 border-2 border-primary/20 rounded-full" />
-                  <div className="absolute bottom-4 left-4 w-8 h-8 border-2 border-purple-500/20 rounded-full" />
                 </div>
 
                 {/* Card shadow/glow */}

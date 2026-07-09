@@ -15,7 +15,8 @@ export default function CetrnajsticaPortfolioPage() {
     description: 'A warm and inviting website for an authentic pizza restaurant serving Zagreb\'s finest wood-fired Neapolitan pies.',
     category: 'Food & Hospitality',
     color: 'from-red-500 to-orange-500',
-    image: '/images/portfolio/cetrnajstica.png',
+    image: '/images/portfolio/cetrnajstica.webp',
+    liveUrl: null, // TODO: add live URL when available
     features: [
       {
         title: 'Menu Display',
@@ -61,15 +62,15 @@ export default function CetrnajsticaPortfolioPage() {
 
   return (
     <main className="bg-white">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioHero project={projectData} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateFeaturesSection features={projectData.features} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioCTASection projectName={projectData.name} color={projectData.color} />
       </Suspense>
     </main>

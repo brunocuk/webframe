@@ -13,6 +13,7 @@ export default function Footer() {
     { label: 'FAQ', href: '/#faq' },
   ]
 
+  // Icons render only once a real profile URL replaces '#'
   const socials = [
     { 
       name: 'LinkedIn', 
@@ -189,7 +190,7 @@ export default function Footer() {
 
               {/* Social Media */}
               <div className="flex gap-3 mt-8">
-                {socials.map((social) => (
+                {socials.filter((social) => social.href !== '#').map((social) => (
                   <motion.a
                     key={social.name}
                     href={social.href}

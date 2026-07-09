@@ -79,7 +79,7 @@ export default function FAQSection() {
   }
 
   return (
-    <section id="faq" className="py-32 px-6 bg-gradient-to-br from-gray-50 via-white to-purple-50/30 relative overflow-hidden">
+    <section id="faq" className="py-24 px-6 bg-gradient-to-br from-gray-50 via-white to-purple-50/30 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <motion.div
@@ -116,7 +116,7 @@ export default function FAQSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}

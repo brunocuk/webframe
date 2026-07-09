@@ -16,25 +16,26 @@ export default function CheeseBarPortfolioPage() {
     description: 'An editorial-style website for Zagreb\'s premier artisan cheese and Croatian wine destination.',
     category: 'Food & Hospitality',
     color: 'from-amber-500 to-orange-500',
-    image: '/images/portfolio/cheese-bar/hero.png',
+    image: '/images/portfolio/cheese-bar/hero.webp',
+    liveUrl: null, // TODO: add live URL when available
     mockups: [
       {
         title: 'Desktop View',
         description: 'Full homepage experience',
         type: 'desktop',
-        image: '/images/portfolio/cheese-bar/hero.png',
+        image: '/images/portfolio/cheese-bar/hero.webp',
       },
       {
         title: 'Mobile View',
         description: 'On-the-go browsing',
         type: 'mobile',
-        image: '/images/portfolio/cheese-bar/mobile.png',
+        image: '/images/portfolio/cheese-bar/mobile.webp',
       },
       {
         title: 'Menu Page',
         description: 'Cheese & wine selection',
         type: 'interior',
-        image: '/images/portfolio/cheese-bar/interior.png',
+        image: '/images/portfolio/cheese-bar/interior.webp',
       },
     ],
     features: [
@@ -81,19 +82,19 @@ export default function CheeseBarPortfolioPage() {
 
   return (
     <main className="bg-white">
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioHero project={projectData} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateFeaturesSection features={projectData.features} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TemplateMockupsSection mockups={projectData.mockups} name={projectData.name} color={projectData.color} />
       </Suspense>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="min-h-[50vh]" />}>
         <PortfolioCTASection projectName={projectData.name} color={projectData.color} />
       </Suspense>
     </main>
