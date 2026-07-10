@@ -4,76 +4,77 @@ import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
 import { useContactModal } from '@/components/ContactModalProvider'
+import SectionHeader from './SectionHeader'
 
 export default function PricingSection() {
   const { openModal } = useContactModal()
   const [ref, inView] = useInView({
     triggerOnce: true,
-    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px',
   })
 
   const [billingCycle, setBillingCycle] = useState('upfront') // 'upfront' or 'subscription'
 
+  // Every tier gets the full craft baseline (custom design, animations, SEO,
+  // analytics) — tiers differ on scale and depth, shown additively so no card
+  // is a list of crossed-out features.
   const plans = [
     {
       name: 'Starter',
-      description: 'Perfect for small businesses that need a simple web presence.',
+      description: 'For a small business that needs a sharp presence, fast.',
       priceUpfront: '1,200',
       maintenanceFee: '49',
       priceSubscription: '149',
       color: 'from-blue-500/20 to-cyan-500/20',
       popular: false,
+      baseline: null,
       features: [
-        { text: '1-2 pages', included: true },
-        { text: 'Mobile responsive', included: true },
-        { text: 'Basic SEO', included: true },
-        { text: 'Contact form', included: true },
-        { text: 'Google Analytics', included: false },
-        { text: 'Integrations', included: false },
-        { text: 'Animations & transitions', included: false },
-        { text: 'Content revisions (1 revision)', included: true },
-        { text: 'Blog section', included: false },
-      ]
+        '1–2 pages, custom designed',
+        'Animations & transitions',
+        'Mobile responsive',
+        'SEO essentials',
+        'Google Analytics',
+        'Contact form',
+        '1 round of revisions',
+      ],
     },
     {
       name: 'Business',
-      description: 'Best value for money — ideal for growing businesses.',
+      description: 'The right fit for most — room to grow and connect your tools.',
       priceUpfront: '2,400',
       maintenanceFee: '79',
       priceSubscription: '299',
       color: 'from-purple-500/20 to-pink-500/20',
       popular: true,
+      baseline: 'Everything in Starter, plus:',
       features: [
-        { text: '3-5 pages', included: true },
-        { text: 'Mobile responsive', included: true },
-        { text: 'Advanced SEO', included: true },
-        { text: 'Google Analytics', included: true },
-        { text: 'Integrations (calendar, forms, CRM)', included: true },
-        { text: 'Animations & transitions', included: true },
-        { text: 'Content revisions (2 revisions)', included: true },
-        { text: 'Blog section', included: false },
-      ]
+        'Up to 5 pages',
+        'Advanced SEO (local search, schema)',
+        'Integrations — booking, calendar, CRM',
+        'Blog with simple editor — publish posts yourself',
+        '2 rounds of revisions',
+      ],
     },
     {
       name: 'Premium',
-      description: 'Complete online presence for serious brands.',
+      description: 'The full online presence for brands with more to say.',
       priceUpfront: '3,900',
       maintenanceFee: '99',
       priceSubscription: '449',
       color: 'from-orange-500/20 to-red-500/20',
       popular: false,
+      baseline: 'Everything in Business, plus:',
       features: [
-        { text: '5-10 pages', included: true },
-        { text: 'Advanced SEO', included: true },
-        { text: 'Google Analytics', included: true },
-        { text: 'Blog section', included: true },
-        { text: 'Advanced integrations (API, systems, CRM)', included: true },
-        { text: 'Animations & transitions', included: true },
-        { text: 'Priority support', included: true },
-        { text: '3 months free maintenance', included: true },
-        { text: 'Content revisions (3 revisions)', included: true },
-      ]
-    }
+        'Up to 10 pages',
+        'Full CMS — edit all your content yourself',
+        'Multilingual (up to 2 languages)',
+        'Copywriting — we write your content',
+        'Advanced integrations (API & custom systems)',
+        'Priority support',
+        '3 months maintenance included',
+        '3 rounds of revisions',
+      ],
+    },
   ]
   
 
@@ -100,38 +101,22 @@ export default function PricingSection() {
   }
 
   return (
-    <section id="pricing" className="py-24 px-6 bg-white relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-20 left-10 w-72 h-72 bg-purple-500/5 rounded-full blur-3xl" />
-
+    <section id="pricing" className="py-20 px-6 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header */}
+        <SectionHeader
+          eyebrow="// pricing"
+          title="Simple, honest pricing."
+          sub="No hidden costs. No surprises. The price you see is the price you pay."
+        />
+
+        {/* Billing Toggle */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-12"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="inline-block mb-4 px-4 py-2 bg-primary/10 rounded-full"
-          >
-            <span className="text-sm font-semibold text-primary">Transparent Pricing</span>
-          </motion.div>
-
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            Choose Your <span className="italic font-light bg-gradient-to-r from-primary to-purple-600 bg-clip-text pr-2 text-transparent">Plan</span>
-          </h2>
-
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            No hidden costs. No surprises. Just clean, simple pricing.
-          </p>
-
-          {/* Billing Toggle */}
           <div className="inline-flex items-center gap-3 p-1.5 bg-gray-100 rounded-full">
             <button
               onClick={() => setBillingCycle('upfront')}
@@ -162,7 +147,7 @@ export default function PricingSection() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="grid md:grid-cols-3 gap-8 mb-20"
+          className="grid md:grid-cols-3 gap-8 mb-12 items-start"
         >
           {plans.map((plan, index) => (
             <motion.div
@@ -174,18 +159,18 @@ export default function PricingSection() {
               {/* Popular Badge */}
               {plan.popular && (
                 <div className="absolute -top-7 left-1/2 -translate-x-1/2 z-20">
-                  <div className="px-4 py-1.5 bg-gradient-to-r from-primary to-purple-600 text-white rounded-full text-xs font-bold shadow-lg">
+                  <div className="px-4 py-1.5 bg-primary text-white rounded-full text-xs font-bold shadow-lg">
                     MOST POPULAR
                   </div>
                 </div>
               )}
 
               {/* Card */}
-              <div className={`relative h-full ${plan.popular ? 'md:scale-105' : ''}`}>
+              <div className={`relative ${plan.popular ? 'md:scale-105' : ''}`}>
                 {/* Main card */}
                 <div className={`relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 border-2 ${
                   plan.popular ? 'border-primary' : 'border-gray-200'
-                } shadow-xl overflow-hidden h-full flex flex-col`}>
+                } shadow-xl overflow-hidden flex flex-col`}>
                   
                   {/* Gradient overlay */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${plan.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
@@ -194,7 +179,7 @@ export default function PricingSection() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   {/* Content */}
-                  <div className="relative z-10 flex flex-col h-full">
+                  <div className="relative z-10 flex flex-col">
                     {/* Header */}
                     <div className="mb-8">
                       <h3 className="text-2xl font-bold mb-2 text-gray-900">
@@ -239,29 +224,29 @@ export default function PricingSection() {
                     </div>
 
                     {/* Features */}
-                    <div className="space-y-4 mb-8 flex-grow">
-                      {plan.features.map((feature, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: -10 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: i * 0.05 }}
+                    {plan.baseline && (
+                      <div className="flex items-center gap-2 mb-4">
+                        <svg className="w-4 h-4 text-primary flex-shrink-0" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M10 4V16M4 10H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                        </svg>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {plan.baseline}
+                        </span>
+                      </div>
+                    )}
+                    <div className="space-y-3 mb-8">
+                      {plan.features.map((feature) => (
+                        <div
+                          key={feature}
                           className="flex items-start gap-3"
                         >
-                          {feature.included ? (
-                            <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                          ) : (
-                            <svg className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                          <span className={`text-sm ${feature.included ? 'text-gray-700' : 'text-gray-400 line-through'}`}>
-                            {feature.text}
+                          <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-sm text-gray-700">
+                            {feature}
                           </span>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
 
@@ -270,9 +255,9 @@ export default function PricingSection() {
                       onClick={openModal}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`block w-full text-center px-6 py-4 rounded-xl font-semibold transition-all ${
+                      className={`block w-full text-center px-6 py-4 rounded-full font-semibold transition-all ${
                         plan.popular
-                          ? 'bg-gradient-to-r from-primary to-purple-600 text-white shadow-lg shadow-primary/30'
+                          ? 'bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary-dark'
                           : 'bg-gray-900 text-white hover:bg-gray-800'
                       }`}
                     >
@@ -305,8 +290,8 @@ export default function PricingSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold mb-2 text-gray-900">Fast Delivery</h3>
-              <p className="text-gray-600 text-sm">All websites delivered within 7 days</p>
+              <h3 className="text-lg font-bold mb-2 text-gray-900">7-Day Delivery</h3>
+              <p className="text-gray-600 text-sm">Guaranteed — or it's free</p>
             </div>
 
             <div className="text-center">
@@ -336,15 +321,15 @@ export default function PricingSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center mt-16"
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="text-center mt-12"
         >
           <p className="text-gray-600 mb-4">Not sure which plan is right for you?</p>
           <motion.button
             onClick={openModal}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 px-8 py-4 border-2 border-gray-900 text-gray-900 rounded-xl font-semibold hover:bg-gray-900 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 border-2 border-gray-900 text-gray-900 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
           >
             Contact Us
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

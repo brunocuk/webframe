@@ -170,9 +170,9 @@ export default function PortfolioSection() {
                     sizes="70vw"
                     className="object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-black/30" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20" />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${project.primaryColor} opacity-20 mix-blend-overlay`} />
+                  <div className="absolute inset-0 bg-black/15" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/30 to-transparent" />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${project.primaryColor} opacity-10 mix-blend-overlay`} />
                 </div>
 
                 {/* Content */}
@@ -263,17 +263,12 @@ export default function PortfolioSection() {
       <section className="block md:hidden py-20 px-6 bg-black">
         {/* Header */}
         <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="inline-block mb-4 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20"
-          >
-            <span className="text-sm font-semibold text-white">Case Studies</span>
-          </motion.div>
+          <div className="font-mono text-xs font-semibold tracking-wider mb-4 text-primary-light">
+            {'// case studies'}
+          </div>
 
           <h2 className="text-4xl font-bold text-white mb-4">
-            Our <span className="italic font-light bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Work</span>
+            Our Work
           </h2>
 
           <p className="text-gray-400">
@@ -309,9 +304,9 @@ export default function PortfolioSection() {
                     sizes="100vw"
                     className="object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-black/40" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${project.primaryColor} opacity-20 mix-blend-overlay`} />
+                  <div className="absolute inset-0 bg-black/25" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${project.primaryColor} opacity-10 mix-blend-overlay`} />
                 </div>
 
                 {/* Content */}

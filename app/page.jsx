@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import HeroSection from '@/components/sections/HeroSection'
+import HeroCodeMorph from '@/components/sections/HeroCodeMorph'
 import BenefitsSection from '@/components/sections/BenefitsSection'
 import HowItWorksSection from '@/components/sections/HowItWorksSection'
 import TemplatesSection from '@/components/sections/TemplatesSection'
@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <main className="bg-white">
       <Suspense fallback={<div className="min-h-screen bg-white" />}>
-        <HeroSection />
+        <HeroCodeMorph />
       </Suspense>
 
       <Suspense fallback={<div className="min-h-[50vh]" />}>
