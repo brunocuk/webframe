@@ -108,8 +108,18 @@ export default function PrivacyPolicyPage() {
                 We do not sell, rent, or share your personal data with third parties, except in the following cases:
               </p>
               <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
-                <li><strong>Service providers:</strong> We use trusted third parties for hosting, analytics (Google Analytics),
-                and email services. These providers may only access your data as necessary to provide services.</li>
+                <li><strong>Service providers:</strong> We use trusted third parties to run our business, and they may
+                only access your data as necessary to provide their services to us:
+                  <ul className="list-disc pl-6 mt-2 space-y-1">
+                    <li><strong>Vercel</strong> — website hosting</li>
+                    <li><strong>Supabase</strong> — secure storage of enquiries, project data and files you upload to your client portal (hosted in the EU)</li>
+                    <li><strong>Resend</strong> — sending transactional emails such as quotes and project updates</li>
+                    <li><strong>Revolut</strong> — payment processing; we never see or store your card details</li>
+                    <li><strong>Google Analytics</strong> — website traffic analysis</li>
+                  </ul>
+                </li>
+                <li><strong>Internal notifications:</strong> When you submit an enquiry, a summary (your name, email and
+                project details) is sent to us as an internal notification, including via WhatsApp, so we can respond quickly.</li>
                 <li><strong>Legal requirements:</strong> We may disclose data if required by law or legal proceedings.</li>
               </ul>
             </section>
