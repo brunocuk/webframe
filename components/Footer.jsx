@@ -9,8 +9,9 @@ export default function Footer() {
   const navigation = [
     { label: 'Portfolio', href: '/#portfolio' },
     { label: 'Process', href: '/#process' },
-    { label: 'Pricing', href: '/#pricing' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'FAQ', href: '/#faq' },
+    { label: 'Contact', href: '/contact' },
   ]
 
   // Icons render only once a real profile URL replaces '#'

@@ -2,27 +2,84 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { PROJECT_TYPES, PROJECT_SIZES, labelFor } from '@/lib/inquiryOptions'
+
+// Start Your Project modal, styled as the site's signature device: a tiny
+// editor window drafting the visitor's project brief, step by step, until
+// it "ships" on the success screen.
+const STEP_META = {
+  1: { eyebrow: '// step 1 of 3', title: 'What are you building?' },
+  2: { eyebrow: '// step 2 of 3', title: 'How big should it be?' },
+  3: { eyebrow: '// step 3 of 3', title: 'Where do we send your quote?' },
+}
+
+const chipContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
+}
+
+const chipItem = {
+  hidden: { opacity: 0, y: 12, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: 'spring', stiffness: 420, damping: 26 },
+  },
+}
+
+function Chip({ selected, onClick, children }) {
+  return (
+    <motion.button
+      variants={chipItem}
+      onClick={onClick}
+      whileHover={{ scale: 1.06, y: -2 }}
+      whileTap={{ scale: 0.94 }}
+      className={`px-5 py-2.5 rounded-full border-2 font-medium transition-colors ${
+        selected
+          ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30'
+          : 'bg-white text-gray-700 border-gray-200 hover:border-primary/50'
+      }`}
+    >
+      {children}
+    </motion.button>
+  )
+}
 
 export default function ContactModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     projectType: '',
-    timeline: '',
+    projectSize: '',
+    name: '',
     email: '',
+    business: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
-  const totalSteps = 4
+  const sent = step === 4
 
   // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
         setStep(1)
-        setFormData({ projectType: '', timeline: '', email: '' })
+        setFormData({ projectType: '', projectSize: '', name: '', email: '', business: '' })
+        setError(null)
       }, 300)
     }
   }, [isOpen])
+
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isOpen, onClose])
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -38,8 +95,8 @@ export default function ContactModal({ isOpen, onClose }) {
 
   const handleOptionSelect = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    // Auto-advance after selection
-    setTimeout(() => setStep(prev => prev + 1), 200)
+    // Let the selection state register before advancing
+    setTimeout(() => setStep(prev => prev + 1), 250)
   }
 
   const handleEmailSubmit = async (e) => {
@@ -47,25 +104,21 @@ export default function ContactModal({ isOpen, onClose }) {
     if (!formData.email) return
 
     setIsSubmitting(true)
+    setError(null)
 
     try {
-      // Get human-readable labels for the selected options
-      const projectTypeLabel = projectTypes.find(t => t.value === formData.projectType)?.label || formData.projectType
-      const timelineLabel = timelines.find(t => t.value === formData.timeline)?.label || formData.timeline
-
-      const response = await fetch('https://api.web3forms.com/submit', {
+      const response = await fetch('/api/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
-          subject: `New Project Inquiry: ${projectTypeLabel}`,
-          from_name: 'Webframe Contact Form',
+          name: formData.name,
           email: formData.email,
-          project_type: projectTypeLabel,
-          timeline: timelineLabel,
-          message: `New project inquiry from ${formData.email}\n\nProject Type: ${projectTypeLabel}\nTimeline: ${timelineLabel}`,
+          projectType: labelFor(PROJECT_TYPES, formData.projectType),
+          projectSize: labelFor(PROJECT_SIZES, formData.projectSize),
+          business: formData.business,
+          source: 'modal',
         }),
       })
 
@@ -75,41 +128,17 @@ export default function ContactModal({ isOpen, onClose }) {
         setStep(4) // Success step
       } else {
         console.error('Form submission failed:', result)
-        alert('Something went wrong. Please try again.')
+        setError('Something went wrong sending your request. Please try again, or email hello@web-frame.eu.')
       }
-    } catch (error) {
-      console.error('Form submission error:', error)
-      alert('Something went wrong. Please try again.')
+    } catch (err) {
+      console.error('Form submission error:', err)
+      setError('Something went wrong sending your request. Please try again, or email hello@web-frame.eu.')
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const projectTypes = [
-    { value: 'business', label: 'Business Website' },
-    { value: 'ecommerce', label: 'E-commerce' },
-    { value: 'portfolio', label: 'Portfolio' },
-    { value: 'other', label: 'Something Else' },
-  ]
-
-  const timelines = [
-    { value: 'asap', label: 'ASAP' },
-    { value: '2-4weeks', label: '2-4 Weeks' },
-    { value: 'flexible', label: 'Flexible' },
-  ]
-
-  const ProgressDots = () => (
-    <div className="flex justify-center gap-2 mb-6">
-      {[1, 2, 3].map((dotStep) => (
-        <div
-          key={dotStep}
-          className={`w-2.5 h-2.5 rounded-full transition-colors ${
-            step >= dotStep ? 'bg-green-500' : 'bg-gray-200'
-          }`}
-        />
-      ))}
-    </div>
-  )
+  const progress = sent ? 1 : (step - 1) / 3
 
   return (
     <AnimatePresence>
@@ -121,160 +150,232 @@ export default function ContactModal({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
-          />
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 overflow-hidden"
+          >
+            {/* Ambient glow drifting behind the card */}
+            <motion.div
+              className="absolute w-[700px] h-[700px] rounded-full blur-3xl -top-40 -left-20"
+              style={{
+                background:
+                  'radial-gradient(circle, rgba(75, 43, 255, 0.25) 0%, rgba(139, 92, 246, 0.12) 50%, transparent 100%)',
+              }}
+              animate={{ x: ['0%', '25%', '0%'], y: ['0%', '18%', '0%'] }}
+              transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </motion.div>
 
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.92, y: 28 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            transition={{ type: 'spring', damping: 24, stiffness: 320 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Start your project"
           >
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
-              {/* Header */}
-              <div className="px-8 pt-8 pb-4 text-center">
-                <p className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
-                  One question at a <span className="text-gray-900">time</span>
-                </p>
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden pointer-events-auto">
+              {/* Editor chrome header */}
+              <div className="flex items-center justify-between px-5 py-3.5 bg-[#161221]">
+                <div className="flex items-center gap-1.5" aria-hidden>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+                </div>
+                <span className="font-mono text-[11px] text-white/60">
+                  your-project.brief
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-[10px] flex items-center gap-1.5">
+                    {sent ? (
+                      <span className="text-green-400">✓ sent</span>
+                    ) : (
+                      <>
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+                        </span>
+                        <span className="text-white/50">drafting…</span>
+                      </>
+                    )}
+                  </span>
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="w-6 h-6 flex items-center justify-center text-white/40 hover:text-white transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Build progress bar */}
+              <div className="h-1 bg-gray-100">
+                <motion.div
+                  className={`h-full ${sent ? 'bg-green-500' : 'bg-primary'}`}
+                  initial={false}
+                  animate={{ width: `${Math.max(progress * 100, 8)}%` }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                />
               </div>
 
               {/* Content */}
-              <div className="px-8 pb-8">
+              <div className="px-8 pt-8 pb-8">
                 <AnimatePresence mode="wait">
-                  {/* Step 1: Project Type */}
-                  {step === 1 && (
+                  {!sent && (
                     <motion.div
-                      key="step1"
-                      initial={{ opacity: 0, x: 20 }}
+                      key={`step${step}`}
+                      initial={{ opacity: 0, x: 32 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.2 }}
+                      exit={{ opacity: 0, x: -32 }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     >
-                      <p className="text-xs text-gray-400 text-center mb-1">STEP 1 OF 3</p>
-                      <ProgressDots />
-                      <h2 className="text-xl font-semibold text-center text-gray-900 mb-6">
-                        What do you need?
+                      <p className="font-mono text-xs font-semibold tracking-wider text-primary text-center mb-2">
+                        {STEP_META[step].eyebrow}
+                      </p>
+                      <h2 className="text-2xl font-bold text-center text-gray-900 mb-7">
+                        {STEP_META[step].title}
                       </h2>
-                      <div className="flex flex-wrap justify-center gap-3">
-                        {projectTypes.map((type) => (
-                          <motion.button
-                            key={type.value}
-                            onClick={() => handleOptionSelect('projectType', type.value)}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`px-5 py-2.5 rounded-full border-2 font-medium transition-all ${
-                              formData.projectType === type.value
-                                ? 'bg-gray-900 text-white border-gray-900'
-                                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-                            }`}
-                          >
-                            {type.label}
-                          </motion.button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
 
-                  {/* Step 2: Timeline */}
-                  {step === 2 && (
-                    <motion.div
-                      key="step2"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <p className="text-xs text-gray-400 text-center mb-1">STEP 2 OF 3</p>
-                      <ProgressDots />
-                      <h2 className="text-xl font-semibold text-center text-gray-900 mb-6">
-                        When do you want to launch?
-                      </h2>
-                      <div className="flex flex-wrap justify-center gap-3">
-                        {timelines.map((time) => (
-                          <motion.button
-                            key={time.value}
-                            onClick={() => handleOptionSelect('timeline', time.value)}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`px-5 py-2.5 rounded-full border-2 font-medium transition-all ${
-                              formData.timeline === time.value
-                                ? 'bg-gray-900 text-white border-gray-900'
-                                : 'bg-white text-gray-700 border-gray-200 hover:border-gray-400'
-                            }`}
-                          >
-                            {time.label}
-                          </motion.button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Step 3: Email */}
-                  {step === 3 && (
-                    <motion.div
-                      key="step3"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <p className="text-xs text-gray-400 text-center mb-1">STEP 3 OF 3</p>
-                      <ProgressDots />
-                      <h2 className="text-xl font-semibold text-center text-gray-900 mb-6">
-                        Where do we send details?
-                      </h2>
-                      <form onSubmit={handleEmailSubmit} className="space-y-4">
-                        <input
-                          type="email"
-                          placeholder="your@email.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                          required
-                          autoFocus
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-gray-900 focus:outline-none transition-colors text-center text-lg"
-                        />
-                        <motion.button
-                          type="submit"
-                          disabled={isSubmitting || !formData.email}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                      {step === 1 && (
+                        <motion.div
+                          variants={chipContainer}
+                          initial="hidden"
+                          animate="visible"
+                          className="flex flex-wrap justify-center gap-3"
                         >
-                          {isSubmitting ? 'Sending...' : 'Get My Quote'}
-                        </motion.button>
-                      </form>
+                          {PROJECT_TYPES.map((type) => (
+                            <Chip
+                              key={type.value}
+                              selected={formData.projectType === type.value}
+                              onClick={() => handleOptionSelect('projectType', type.value)}
+                            >
+                              {type.label}
+                            </Chip>
+                          ))}
+                        </motion.div>
+                      )}
+
+                      {step === 2 && (
+                        <motion.div
+                          variants={chipContainer}
+                          initial="hidden"
+                          animate="visible"
+                          className="flex flex-wrap justify-center gap-3"
+                        >
+                          {PROJECT_SIZES.map((size) => (
+                            <Chip
+                              key={size.value}
+                              selected={formData.projectSize === size.value}
+                              onClick={() => handleOptionSelect('projectSize', size.value)}
+                            >
+                              {size.label}
+                            </Chip>
+                          ))}
+                        </motion.div>
+                      )}
+
+                      {step === 3 && (
+                        <form onSubmit={handleEmailSubmit} className="space-y-4">
+                          <motion.div
+                            variants={chipContainer}
+                            initial="hidden"
+                            animate="visible"
+                            className="space-y-4"
+                          >
+                            <motion.input
+                              variants={chipItem}
+                              type="email"
+                              placeholder="your@email.com"
+                              autoComplete="email"
+                              value={formData.email}
+                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                              required
+                              autoFocus
+                              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none transition-colors text-center text-lg"
+                            />
+                            <motion.input
+                              variants={chipItem}
+                              type="text"
+                              placeholder="Your name (optional)"
+                              autoComplete="name"
+                              value={formData.name}
+                              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none transition-colors text-center"
+                            />
+                            <motion.input
+                              variants={chipItem}
+                              type="text"
+                              placeholder="Business name or current website (optional)"
+                              value={formData.business}
+                              onChange={(e) => setFormData(prev => ({ ...prev, business: e.target.value }))}
+                              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary focus:outline-none transition-colors text-center"
+                            />
+                          </motion.div>
+                          {error && (
+                            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-left">
+                              {error}
+                            </p>
+                          )}
+                          <motion.button
+                            type="submit"
+                            disabled={isSubmitting || !formData.email}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full py-3.5 bg-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/30 hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all"
+                          >
+                            {isSubmitting ? 'Sending…' : 'Get My Quote'}
+                          </motion.button>
+                        </form>
+                      )}
                     </motion.div>
                   )}
 
-                  {/* Step 4: Success */}
-                  {step === 4 && (
+                  {/* Success — the brief ships */}
+                  {sent && (
                     <motion.div
-                      key="step4"
+                      key="sent"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3 }}
-                      className="text-center py-4"
+                      className="text-center py-2"
                     >
-                      <div className="flex justify-center gap-2 mb-6">
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                      <div className="relative w-16 h-16 mx-auto mb-6">
+                        {/* Radiating pulse */}
+                        <motion.div
+                          initial={{ scale: 0.6, opacity: 0.8 }}
+                          animate={{ scale: 2.2, opacity: 0 }}
+                          transition={{ duration: 1.2, delay: 0.25, ease: 'easeOut' }}
+                          className="absolute inset-0 rounded-full bg-green-400"
+                        />
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.15, type: 'spring', stiffness: 260, damping: 18 }}
+                          className="relative w-16 h-16 bg-green-500 rounded-full flex items-center justify-center"
+                        >
+                          <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <motion.path
+                              initial={{ pathLength: 0 }}
+                              animate={{ pathLength: 1 }}
+                              transition={{ delay: 0.4, duration: 0.4, ease: 'easeOut' }}
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        </motion.div>
                       </div>
-                      <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                        Done — we'll be in touch!
+                      <p className="font-mono text-xs font-semibold tracking-wider text-green-600 mb-2">
+                        ✓ brief received
+                      </p>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                        Done — we&apos;ll be in touch!
                       </h2>
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                        className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
-                      >
-                        <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </motion.div>
                       <p className="text-gray-500 mb-6">
                         Expect an email within 24 hours.
                       </p>
@@ -290,7 +391,7 @@ export default function ContactModal({ isOpen, onClose }) {
               </div>
 
               {/* Back button (steps 2-3) */}
-              {step > 1 && step < 4 && (
+              {step > 1 && !sent && (
                 <div className="px-8 pb-6 text-center">
                   <button
                     onClick={() => setStep(prev => prev - 1)}
@@ -300,16 +401,6 @@ export default function ContactModal({ isOpen, onClose }) {
                   </button>
                 </div>
               )}
-
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </div>
           </motion.div>
         </>
