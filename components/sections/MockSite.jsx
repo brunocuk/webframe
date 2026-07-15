@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 // Fictional client used by the hero: an independent bike shop — at home in
 // the NL/DK/UK/IE markets Webframe serves. Rendered as real DOM (not a
@@ -143,7 +144,7 @@ export default function MockSite({ show = {}, placeholders = false }) {
         </span>
       </Reveal>
 
-      {/* Hero graphic — deep green panel with a cropped wheel */}
+      {/* Hero graphic — bike photo with a soft brand-green tint */}
       <Reveal
         shown={s.media}
         placeholder={placeholders}
@@ -151,42 +152,29 @@ export default function MockSite({ show = {}, placeholders = false }) {
         fromX={36}
         fromY={-24}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0f6b50] via-[#0d5c44] to-[#083a2b]" />
-        {/* Soft light */}
+        <Image
+          src="/images/northside-bike.webp"
+          alt=""
+          fill
+          unoptimized
+          className="object-cover"
+          style={{ objectPosition: 'center 58%' }}
+        />
+        {/* Brand tint + soft light so the badges sit on-palette */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.14), transparent 55%)',
+              'linear-gradient(120deg, rgba(8,58,43,0.5) 0%, rgba(13,92,68,0.18) 55%, rgba(8,58,43,0.4) 100%)',
           }}
         />
-        {/* Route line */}
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden>
-          <path
-            d="M-4 62 C 40 58, 58 24, 104 30 S 176 52, 206 34"
-            fill="none"
-            stroke="rgba(255,255,255,0.28)"
-            strokeWidth="1.6"
-            strokeDasharray="5 4"
-            strokeLinecap="round"
-          />
-        </svg>
-        {/* Wheel, cropped at the corner */}
-        <div className="absolute -right-8 -bottom-12 w-36 h-36 xl:w-44 xl:h-44">
-          <div className="absolute inset-0 rounded-full border-[3px] border-white/30" />
-          <div className="absolute inset-[14%] rounded-full border border-white/15" />
-          {[0, 30, 60, 90, 120, 150].map((deg) => (
-            <div
-              key={deg}
-              className="absolute top-1/2 left-0 w-full h-[1.5px] bg-white/15"
-              style={{ transform: `rotate(${deg}deg)` }}
-            />
-          ))}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
-            style={{ backgroundColor: pop }}
-          />
-        </div>
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(120% 90% at 15% 0%, rgba(255,255,255,0.1), transparent 55%)',
+          }}
+        />
         <div
           className="absolute bottom-2.5 left-2.5 px-2 py-1 bg-white/95 rounded-full text-[8px] font-semibold"
           style={{ color: accent }}

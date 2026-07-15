@@ -40,7 +40,9 @@ export default function HeroCopy({ centered = false, showGuarantees = true }) {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="text-5xl md:text-6xl xl:text-7xl font-bold mb-6 leading-[0.95] tracking-tight"
       >
-        Your Custom Website.
+        Your Custom
+        <br />
+        Website.
         <br />
         <span className="italic font-light bg-gradient-to-r from-primary via-purple-600 to-blue-500 bg-clip-text text-transparent">
           In 7 Days.
