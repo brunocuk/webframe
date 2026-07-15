@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useContactModal } from '@/components/ContactModalProvider'
 import SectionHeader from './SectionHeader'
 
-export default function PricingSection() {
+export default function PricingSection({ showHeader = true, showCompareLink = true }) {
   const { openModal } = useContactModal()
   const [ref, inView] = useInView({
     triggerOnce: true,
@@ -56,7 +56,7 @@ export default function PricingSection() {
       ],
     },
     {
-      name: 'Premium',
+      name: 'Complete',
       description: 'The full online presence for brands with more to say.',
       priceUpfront: '3,900',
       maintenanceFee: '99',
@@ -103,11 +103,13 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="py-20 px-6 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        <SectionHeader
-          eyebrow="// pricing"
-          title="Simple, honest pricing."
-          sub="No hidden costs. No surprises. The price you see is the price you pay."
-        />
+        {showHeader && (
+          <SectionHeader
+            eyebrow="// pricing"
+            title="Simple, honest pricing."
+            sub="No hidden costs. No surprises. The price you see is the price you pay."
+          />
+        )}
 
         {/* Billing Toggle */}
         <motion.div
@@ -147,14 +149,14 @@ export default function PricingSection() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="grid md:grid-cols-3 gap-8 mb-12 items-start"
+          className="grid md:grid-cols-3 gap-8 mb-12"
         >
           {plans.map((plan, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
               whileHover={{ y: -12, transition: { duration: 0.3 } }}
-              className="group relative"
+              className="group relative h-full"
             >
               {/* Popular Badge */}
               {plan.popular && (
@@ -166,9 +168,9 @@ export default function PricingSection() {
               )}
 
               {/* Card */}
-              <div className={`relative ${plan.popular ? 'md:scale-105' : ''}`}>
+              <div className={`relative h-full ${plan.popular ? 'md:scale-105' : ''}`}>
                 {/* Main card */}
-                <div className={`relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 border-2 ${
+                <div className={`relative h-full bg-white/80 backdrop-blur-xl rounded-3xl p-8 border-2 ${
                   plan.popular ? 'border-primary' : 'border-gray-200'
                 } shadow-xl overflow-hidden flex flex-col`}>
                   
@@ -179,7 +181,7 @@ export default function PricingSection() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   {/* Content */}
-                  <div className="relative z-10 flex flex-col">
+                  <div className="relative z-10 flex flex-col flex-1">
                     {/* Header */}
                     <div className="mb-8">
                       <h3 className="text-2xl font-bold mb-2 text-gray-900">
@@ -255,7 +257,7 @@ export default function PricingSection() {
                       onClick={openModal}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`block w-full text-center px-6 py-4 rounded-full font-semibold transition-all ${
+                      className={`mt-auto block w-full text-center px-6 py-4 rounded-full font-semibold transition-all ${
                         plan.popular
                           ? 'bg-primary text-white shadow-lg shadow-primary/30 hover:bg-primary-dark'
                           : 'bg-gray-900 text-white hover:bg-gray-800'
@@ -273,6 +275,74 @@ export default function PricingSection() {
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* Compare link */}
+        {showCompareLink && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center -mt-4 mb-12"
+          >
+            <a
+              href="/pricing#compare"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
+            >
+              Compare all plans in detail
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          </motion.div>
+        )}
+
+        {/* Maintenance explainer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-12 bg-white rounded-3xl p-8 md:p-10 border border-gray-200 shadow-sm"
+        >
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <div className="font-mono text-xs font-semibold tracking-wider text-primary mb-3">
+                // maintenance
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                Why add monthly maintenance?
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                A website isn&apos;t finished at launch — software needs updating,
+                content goes stale, and small changes always come up. Maintenance
+                means your site stays fast, secure and current, and changes get
+                done without hourly invoices or waiting in a queue.
+              </p>
+              <p className="text-gray-500 text-xs">
+                Included in every Monthly Plan · optional add-on with Pay Upfront
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                'Security & software updates',
+                'Backups & uptime monitoring',
+                'Small content changes, done for you',
+                'Priority help when something breaks',
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="flex items-start gap-2.5 bg-gray-50 rounded-xl px-4 py-3"
+                >
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium text-gray-700">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </motion.div>
 
         {/* Additional Info */}

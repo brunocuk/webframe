@@ -41,7 +41,7 @@ export default function FAQSection() {
     },
     {
       question: 'Can I edit the content myself after launch?',
-      answer: 'Yes. On the Business package you publish blog posts yourself through a simple editor, and on Premium you edit all of your site\'s content through a custom CMS. For anything beyond that, use the maintenance package or request a one-off change.',
+      answer: 'Yes. On the Business package you publish blog posts yourself through a simple editor, and on Complete you edit all of your site\'s content through a custom CMS. For anything beyond that, use the maintenance package or request a one-off change.',
       color: 'from-pink-500 to-rose-500',
     },
     {
