@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 import { LEAD_STATUSES } from '@/lib/inquiryOptions'
-import { createOrder } from '@/lib/revolut'
+import { createOrder, createSubscriptionLink } from '@/lib/revolut'
 import { sendEmail, quoteEmailHtml } from '@/lib/email'
 import { ensureProjectForLead, PROJECT_STAGES } from '@/lib/portal'
 
@@ -19,7 +19,7 @@ export async function createAndSendQuote(leadId, { plan, amountEur, paymentMode 
   if (!plan || !Number.isFinite(amount) || amount <= 0) {
     return { error: 'Pick a plan and a valid amount.' }
   }
-  if (!['full', 'deposit', 'balance'].includes(paymentMode)) {
+  if (!['full', 'deposit', 'balance', 'monthly'].includes(paymentMode)) {
     return { error: 'Invalid payment mode.' }
   }
 
@@ -31,15 +31,29 @@ export async function createAndSendQuote(leadId, { plan, amountEur, paymentMode 
   if (leadError || !lead) return { error: 'Lead not found.' }
 
   const modeLabel =
-    paymentMode === 'deposit' ? '50% deposit' : paymentMode === 'balance' ? 'final balance' : 'full payment'
+    paymentMode === 'deposit'
+      ? '50% deposit'
+      : paymentMode === 'balance'
+        ? 'final balance'
+        : paymentMode === 'monthly'
+          ? 'monthly subscription'
+          : 'full payment'
 
   let order
   try {
-    order = await createOrder({
-      amountEur: amount,
-      description: `Webframe ${plan} plan — ${modeLabel} — ${lead.email}`,
-      customerEmail: lead.email,
-    })
+    order =
+      paymentMode === 'monthly'
+        ? await createSubscriptionLink({
+            email: lead.email,
+            name: lead.name,
+            planName: plan,
+            amountEur: amount,
+          })
+        : await createOrder({
+            amountEur: amount,
+            description: `Webframe ${plan} plan — ${modeLabel} — ${lead.email}`,
+            customerEmail: lead.email,
+          })
   } catch (err) {
     console.error(err)
     return { error: 'Revolut order failed — check the server logs.' }

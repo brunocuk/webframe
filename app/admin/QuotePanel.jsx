@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { createAndSendQuote } from './actions'
-import { PLAN_PRICES } from '@/lib/inquiryOptions'
+import { PLAN_PRICES, PLAN_PRICES_MONTHLY } from '@/lib/inquiryOptions'
 
 const QUOTE_STATUS_STYLES = {
   sent: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -40,7 +40,12 @@ export default function QuotePanel({ leadId, quotes }) {
   const showNewQuoteButton =
     !latest || latest.status === 'cancelled' || (latest.status === 'paid' && latest.payment_mode === 'deposit')
 
-  const effectiveAmount = mode === 'full' ? amount : Math.round(amount / 2)
+  const effectiveAmount = mode === 'deposit' ? Math.round(amount / 2) : amount
+
+  const pickMode = (nextMode) => {
+    setMode(nextMode)
+    setAmount(nextMode === 'monthly' ? PLAN_PRICES_MONTHLY[plan] ?? amount : PLAN_PRICES[plan] ?? amount)
+  }
 
   const submit = () => {
     setFeedback(null)
@@ -48,7 +53,14 @@ export default function QuotePanel({ leadId, quotes }) {
       const result = await createAndSendQuote(leadId, {
         plan,
         amountEur: effectiveAmount,
-        paymentMode: mode === 'full' ? 'full' : latest?.payment_mode === 'deposit' ? 'balance' : 'deposit',
+        paymentMode:
+          mode === 'monthly'
+            ? 'monthly'
+            : mode === 'full'
+              ? 'full'
+              : latest?.payment_mode === 'deposit'
+                ? 'balance'
+                : 'deposit',
       })
       if (result?.error) setFeedback({ type: 'error', text: result.error })
       else {
@@ -72,7 +84,9 @@ export default function QuotePanel({ leadId, quotes }) {
                 ? `deposit ${latest.status}`
                 : latest.payment_mode === 'balance'
                   ? `balance ${latest.status}`
-                  : `quote ${latest.status}`}
+                  : latest.payment_mode === 'monthly'
+                    ? `monthly ${latest.status}`
+                    : `quote ${latest.status}`}
             </span>
             <span className="text-xs font-semibold text-gray-700">
               €{Number(latest.amount_eur).toLocaleString('en-IE')}
@@ -98,8 +112,11 @@ export default function QuotePanel({ leadId, quotes }) {
           <select
             value={plan}
             onChange={(e) => {
-              setPlan(e.target.value)
-              setAmount(PLAN_PRICES[e.target.value] ?? amount)
+              const nextPlan = e.target.value
+              setPlan(nextPlan)
+              setAmount(
+                (mode === 'monthly' ? PLAN_PRICES_MONTHLY[nextPlan] : PLAN_PRICES[nextPlan]) ?? amount
+              )
             }}
             className="w-full px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs font-medium bg-white focus:outline-none focus:border-primary"
           >
@@ -124,12 +141,13 @@ export default function QuotePanel({ leadId, quotes }) {
           {latest?.payment_mode !== 'deposit' && (
             <div className="flex gap-1.5">
               {[
-                { value: 'full', label: 'Full amount' },
-                { value: 'deposit', label: '50% deposit' },
+                { value: 'full', label: 'Full' },
+                { value: 'deposit', label: '50% dep.' },
+                { value: 'monthly', label: 'Monthly' },
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setMode(option.value)}
+                  onClick={() => pickMode(option.value)}
                   className={`flex-1 px-2 py-1.5 rounded-lg border text-[11px] font-semibold transition-colors ${
                     mode === option.value
                       ? 'bg-gray-900 text-white border-gray-900'
@@ -143,7 +161,11 @@ export default function QuotePanel({ leadId, quotes }) {
           )}
 
           <div className="text-[11px] text-gray-500">
-            Will charge: <span className="font-bold text-gray-900">€{effectiveAmount.toLocaleString('en-IE')}</span>
+            Will charge:{' '}
+            <span className="font-bold text-gray-900">
+              €{effectiveAmount.toLocaleString('en-IE')}
+              {mode === 'monthly' ? '/mo' : ''}
+            </span>
           </div>
 
           <div className="flex gap-2">
