@@ -1,8 +1,5 @@
 import './globals.css'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import SmoothScroll from '@/components/SmoothScroll'
-import CookieConsent from '@/components/CookieConsent'
+import SiteChrome from '@/components/SiteChrome'
 import ContactModalProvider from '@/components/ContactModalProvider'
 
 export const metadata = {
@@ -22,12 +19,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <ContactModalProvider>
-          <SmoothScroll>
-            <Header />
-            {children}
-            <Footer />
-          </SmoothScroll>
-          <CookieConsent />
+          <SiteChrome>{children}</SiteChrome>
         </ContactModalProvider>
       </body>
     </html>
