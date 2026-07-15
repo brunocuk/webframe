@@ -86,27 +86,6 @@ export default function CTASection() {
           and be live within a week.
         </motion.p>
 
-        {/* Founder */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="inline-flex items-center gap-4 mb-12 px-6 py-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 text-left"
-        >
-          {/* TODO: swap the initials avatar for a real photo (e.g. /images/bruno.jpg) */}
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-lg">BČ</span>
-          </div>
-          <div>
-            <p className="text-white font-semibold">Bruno Čukić</p>
-            <p className="text-gray-400 text-sm">Founder & Developer</p>
-            <p className="text-gray-400 text-sm mt-1">
-              You&apos;ll work with me directly — from first call to launch.
-            </p>
-          </div>
-        </motion.div>
-
         {/* Benefits Grid */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

@@ -5,6 +5,7 @@ import HowItWorksSection from '@/components/sections/HowItWorksSection'
 import TemplatesSection from '@/components/sections/TemplatesSection'
 import PricingSection from '@/components/sections/PricingSection'
 import FAQSection from '@/components/sections/FAQSection'
+import FounderSection from '@/components/sections/FounderSection'
 import CTASection from '@/components/sections/CTASection'
 
 export default function HomePage() {
@@ -33,8 +34,12 @@ export default function HomePage() {
       <Suspense fallback={<div className="h-96 bg-gray-50" />}>
         <FAQSection />
       </Suspense>
-      
-      <Suspense fallback={<div className="h-96 bg-white" />}>
+
+      <Suspense fallback={<div className="h-96 bg-black" />}>
+        <FounderSection />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-96 bg-black" />}>
         <CTASection />
       </Suspense>
     </main>
