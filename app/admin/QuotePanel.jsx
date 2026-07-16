@@ -26,7 +26,7 @@ function CopyLink({ link }) {
   )
 }
 
-export default function QuotePanel({ leadId, quotes, defaultPlan }) {
+export default function QuotePanel({ leadId, quotes, defaultPlan, readOnly = false }) {
   const initialPlan = PLAN_PRICES[defaultPlan] ? defaultPlan : 'Business'
   const [open, setOpen] = useState(false)
   const [plan, setPlan] = useState(initialPlan)
@@ -97,7 +97,9 @@ export default function QuotePanel({ leadId, quotes, defaultPlan }) {
         </div>
       )}
 
-      {showNewQuoteButton && !open && (
+      {readOnly && !latest && <span className="text-[11px] text-gray-400">—</span>}
+
+      {!readOnly && showNewQuoteButton && !open && (
         <button
           onClick={() => setOpen(true)}
           className="px-3 py-1.5 rounded-full bg-gray-900 text-white text-xs font-semibold hover:bg-gray-800 transition-colors"

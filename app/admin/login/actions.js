@@ -2,20 +2,26 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { adminToken, ADMIN_COOKIE, ADMIN_SESSION_DAYS } from '@/lib/adminAuth'
+import {
+  roleForCredentials,
+  tokenForRole,
+  ADMIN_COOKIE,
+  ADMIN_SESSION_DAYS,
+} from '@/lib/adminAuth'
 
 export async function login(prevState, formData) {
+  const email = formData.get('email')
   const password = formData.get('password')
-  const expected = process.env.ADMIN_PASSWORD
 
-  if (!expected) {
+  if (!process.env.ADMIN_PASSWORD) {
     return { error: 'ADMIN_PASSWORD is not configured on the server.' }
   }
-  if (typeof password !== 'string' || password !== expected) {
-    return { error: 'Wrong password — access denied.' }
+  const role = await roleForCredentials(email, password)
+  if (!role) {
+    return { error: 'Wrong email or password — access denied.' }
   }
 
-  const token = await adminToken()
+  const token = await tokenForRole(role)
   const cookieStore = await cookies()
   cookieStore.set(ADMIN_COOKIE, token, {
     httpOnly: true,

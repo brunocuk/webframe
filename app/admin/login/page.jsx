@@ -59,10 +59,18 @@ export default function AdminLoginPage() {
               className="space-y-4"
             >
               <input
+                type="email"
+                name="email"
+                placeholder="you@web-frame.eu"
+                autoFocus
+                required
+                autoComplete="username"
+                className="w-full px-4 py-3.5 rounded-xl bg-white/5 border-2 border-white/10 text-white text-center placeholder:text-white/30 focus:border-primary focus:outline-none transition-colors"
+              />
+              <input
                 type="password"
                 name="password"
                 placeholder="Password"
-                autoFocus
                 required
                 autoComplete="current-password"
                 className="w-full px-4 py-3.5 rounded-xl bg-white/5 border-2 border-white/10 text-white text-center placeholder:text-white/30 focus:border-primary focus:outline-none transition-colors"

@@ -1,9 +1,12 @@
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
+import { getAdminRole } from '@/lib/adminRole'
 import { LEAD_STATUSES } from '@/lib/inquiryOptions'
 import { UPLOADS_BUCKET } from '@/lib/portal'
 import StatusSelect from './StatusSelect'
 import QuotePanel from './QuotePanel'
 import ProjectPanel from './ProjectPanel'
+import AddLead from './AddLead'
+import CallTime from './CallTime'
 import { logout } from './login/actions'
 
 export const dynamic = 'force-dynamic'
@@ -30,6 +33,8 @@ function Hint({ title, children }) {
 }
 
 export default async function AdminLeadsPage() {
+  const role = (await getAdminRole()) || 'sales'
+  const isOwner = role === 'owner'
   const supabase = getSupabaseAdmin()
 
   let leads = null
@@ -77,8 +82,16 @@ export default async function AdminLeadsPage() {
             // webframe crm
           </div>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Leads</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Leads
+              {!isOwner && (
+                <span className="ml-3 align-middle px-2 py-0.5 bg-amber-50 border border-amber-200 rounded-full text-[11px] font-semibold text-amber-700">
+                  sales access
+                </span>
+              )}
+            </h1>
             <div className="flex flex-wrap items-center gap-2">
+              <AddLead />
               {LEAD_STATUSES.map((s) => (
                 <span
                   key={s}
@@ -154,6 +167,9 @@ export default async function AdminLeadsPage() {
                       >
                         {lead.email}
                       </a>
+                      <div className="mt-1">
+                        <CallTime leadId={lead.id} callAt={lead.call_at} />
+                      </div>
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-700">
                       <div>{lead.project_type || '—'}</div>
@@ -187,6 +203,7 @@ export default async function AdminLeadsPage() {
                         leadId={lead.id}
                         quotes={lead.webframe_quotes}
                         defaultPlan={lead.plan}
+                        readOnly={!isOwner}
                       />
                     </td>
                     <td className="px-5 py-4">
@@ -194,6 +211,7 @@ export default async function AdminLeadsPage() {
                         lead={lead}
                         project={lead.webframe_projects?.[0] || null}
                         fileLinks={fileLinks}
+                        readOnly={!isOwner}
                       />
                     </td>
                   </tr>

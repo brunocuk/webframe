@@ -20,12 +20,13 @@ function CopyButton({ getText, label }) {
   )
 }
 
-export default function ProjectPanel({ lead, project, fileLinks }) {
+export default function ProjectPanel({ lead, project, fileLinks, readOnly = false }) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState(null)
   const [showFiles, setShowFiles] = useState(false)
 
   if (!project) {
+    if (readOnly) return <span className="text-[11px] text-gray-400">—</span>
     return (
       <div className="min-w-[150px]">
         <button
@@ -52,21 +53,27 @@ export default function ProjectPanel({ lead, project, fileLinks }) {
 
   return (
     <div className="space-y-1.5 min-w-[170px]">
-      <select
-        defaultValue={project.stage}
-        disabled={isPending}
-        onChange={(e) => {
-          const stage = e.target.value
-          startTransition(() => updateProjectStage(project.id, stage))
-        }}
-        className="px-2.5 py-1.5 rounded-full border border-primary/30 bg-purple-50 text-primary text-xs font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
-      >
-        {PROJECT_STAGES.map((s) => (
-          <option key={s.value} value={s.value}>
-            {s.label}
-          </option>
-        ))}
-      </select>
+      {readOnly ? (
+        <span className="inline-block px-2.5 py-1.5 rounded-full border border-primary/30 bg-purple-50 text-primary text-xs font-semibold">
+          {PROJECT_STAGES.find((s) => s.value === project.stage)?.label || project.stage}
+        </span>
+      ) : (
+        <select
+          defaultValue={project.stage}
+          disabled={isPending}
+          onChange={(e) => {
+            const stage = e.target.value
+            startTransition(() => updateProjectStage(project.id, stage))
+          }}
+          className="px-2.5 py-1.5 rounded-full border border-primary/30 bg-purple-50 text-primary text-xs font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50"
+        >
+          {PROJECT_STAGES.map((s) => (
+            <option key={s.value} value={s.value}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+      )}
 
       <div className="flex items-center gap-2.5">
         <CopyButton

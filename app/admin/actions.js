@@ -6,12 +6,26 @@ import { LEAD_STATUSES } from '@/lib/inquiryOptions'
 import { createOrder, createSubscriptionLink } from '@/lib/revolut'
 import { sendEmail, quoteEmailHtml } from '@/lib/email'
 import { ensureProjectForLead, PROJECT_STAGES } from '@/lib/portal'
+import { getAdminRole } from '@/lib/adminRole'
+import { notifyWhatsApp } from '@/lib/notify'
+
+// Money and delivery actions require the owner session; lead management is
+// open to both roles (middleware already guarantees a valid session).
+async function requireOwner() {
+  const role = await getAdminRole()
+  if (role !== 'owner') {
+    return { error: 'This action requires the owner login.' }
+  }
+  return null
+}
 
 // Creates a Revolut payment order, stores the quote, emails the payment
 // link to the lead, and moves the lead to `quoted`. If the email fails
 // (e.g. Resend domain not verified yet) the quote is still saved so the
 // payment link can be copied and sent manually.
 export async function createAndSendQuote(leadId, { plan, amountEur, paymentMode }) {
+  const denied = await requireOwner()
+  if (denied) return denied
   const supabase = getSupabaseAdmin()
   if (!supabase) return { error: 'Supabase is not configured' }
 
@@ -102,6 +116,8 @@ export async function createAndSendQuote(leadId, { plan, amountEur, paymentMode 
 
 // Manual portal creation — for leads that pay outside the automated flow.
 export async function createPortalForLead(leadId) {
+  const denied = await requireOwner()
+  if (denied) return denied
   const supabase = getSupabaseAdmin()
   if (!supabase) return { error: 'Supabase is not configured' }
   const { data: lead } = await supabase
@@ -121,6 +137,8 @@ export async function createPortalForLead(leadId) {
 }
 
 export async function updateProjectStage(projectId, stage) {
+  const denied = await requireOwner()
+  if (denied) throw new Error(denied.error)
   if (!PROJECT_STAGES.some((s) => s.value === stage)) {
     throw new Error('Invalid stage')
   }
@@ -132,6 +150,50 @@ export async function updateProjectStage(projectId, stage) {
     .eq('id', projectId)
   if (error) throw new Error(`Stage update failed: ${error.message}`)
   revalidatePath('/admin')
+}
+
+// Manual lead entry — Chris's workflow for LinkedIn-sourced prospects.
+export async function createManualLead({ name, email, business, plan, callAt, notes }) {
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return { error: 'Supabase is not configured' }
+
+  const cleanEmail = typeof email === 'string' ? email.trim() : ''
+  if (!cleanEmail || !cleanEmail.includes('@')) {
+    return { error: 'A valid email is required.' }
+  }
+
+  const callIso = callAt ? new Date(callAt).toISOString() : null
+  const { error } = await supabase.from('webframe_leads').insert({
+    name: (name || '').trim() || null,
+    email: cleanEmail,
+    business: (business || '').trim() || null,
+    plan: plan || null,
+    message: (notes || '').trim() || null,
+    source: 'outbound',
+    status: 'contacted',
+    call_at: callIso,
+  })
+  if (error) return { error: `Could not save the lead: ${error.message}` }
+
+  notifyWhatsApp(
+    `📇 Outbound lead added: ${name || cleanEmail}` +
+      (callIso ? ` — call ${new Date(callIso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}` : '')
+  )
+  revalidatePath('/admin')
+  return { ok: true }
+}
+
+export async function updateLeadCall(id, callAt) {
+  const supabase = getSupabaseAdmin()
+  if (!supabase) return { error: 'Supabase is not configured' }
+  const callIso = callAt ? new Date(callAt).toISOString() : null
+  const { error } = await supabase
+    .from('webframe_leads')
+    .update({ call_at: callIso })
+    .eq('id', id)
+  if (error) return { error: `Could not update the call time: ${error.message}` }
+  revalidatePath('/admin')
+  return { ok: true }
 }
 
 export async function updateLeadStatus(id, status) {
