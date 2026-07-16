@@ -254,7 +254,7 @@ export default function PricingSection({ showHeader = true, showCompareLink = tr
 
                     {/* CTA Button */}
                     <motion.button
-                      onClick={openModal}
+                      onClick={() => openModal({ plan: plan.name })}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className={`mt-auto block w-full text-center px-6 py-4 rounded-full font-semibold transition-all ${

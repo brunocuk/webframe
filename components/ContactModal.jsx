@@ -2,16 +2,25 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PROJECT_TYPES, PROJECT_SIZES, labelFor } from '@/lib/inquiryOptions'
+import {
+  PROJECT_TYPES,
+  PROJECT_SIZES,
+  PLAN_OPTIONS,
+  PLAN_PRICES,
+  labelFor,
+} from '@/lib/inquiryOptions'
 
 // Start Your Project modal, styled as the site's signature device: a tiny
 // editor window drafting the visitor's project brief, step by step, until
-// it "ships" on the success screen.
-const STEP_META = {
+// it "ships" on the success screen. When opened from a plan card the plan
+// is recorded and shown; otherwise step 2 asks the visitor to pick one.
+const stepMeta = (step, hasPlan) => ({
   1: { eyebrow: '// step 1 of 3', title: 'What are you building?' },
-  2: { eyebrow: '// step 2 of 3', title: 'How big should it be?' },
+  2: hasPlan
+    ? { eyebrow: '// step 2 of 3', title: 'How big should it be?' }
+    : { eyebrow: '// step 2 of 3', title: 'Which plan fits best?' },
   3: { eyebrow: '// step 3 of 3', title: 'Where do we send your quote?' },
-}
+})[step]
 
 const chipContainer = {
   hidden: {},
@@ -46,11 +55,12 @@ function Chip({ selected, onClick, children }) {
   )
 }
 
-export default function ContactModal({ isOpen, onClose }) {
+export default function ContactModal({ isOpen, onClose, preselectedPlan = null }) {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     projectType: '',
     projectSize: '',
+    plan: '',
     name: '',
     email: '',
     business: '',
@@ -60,16 +70,18 @@ export default function ContactModal({ isOpen, onClose }) {
 
   const sent = step === 4
 
-  // Reset form when modal closes
+  // Reset form when modal closes; adopt the clicked plan when it opens
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      setFormData(prev => ({ ...prev, plan: preselectedPlan || prev.plan }))
+    } else {
       setTimeout(() => {
         setStep(1)
-        setFormData({ projectType: '', projectSize: '', name: '', email: '', business: '' })
+        setFormData({ projectType: '', projectSize: '', plan: '', name: '', email: '', business: '' })
         setError(null)
       }, 300)
     }
-  }, [isOpen])
+  }, [isOpen, preselectedPlan])
 
   // Close on Escape
   useEffect(() => {
@@ -116,7 +128,10 @@ export default function ContactModal({ isOpen, onClose }) {
           name: formData.name,
           email: formData.email,
           projectType: labelFor(PROJECT_TYPES, formData.projectType),
-          projectSize: labelFor(PROJECT_SIZES, formData.projectSize),
+          projectSize: formData.projectSize
+            ? labelFor(PROJECT_SIZES, formData.projectSize)
+            : '',
+          plan: formData.plan === 'unsure' ? 'Not sure' : formData.plan,
           business: formData.business,
           source: 'modal',
         }),
@@ -234,10 +249,17 @@ export default function ContactModal({ isOpen, onClose }) {
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     >
                       <p className="font-mono text-xs font-semibold tracking-wider text-primary text-center mb-2">
-                        {STEP_META[step].eyebrow}
+                        {stepMeta(step, !!preselectedPlan).eyebrow}
                       </p>
+                      {preselectedPlan && PLAN_PRICES[preselectedPlan] && (
+                        <div className="flex justify-center mb-3">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-50 border border-primary/20 rounded-full text-xs font-semibold text-primary">
+                            {preselectedPlan} plan · €{PLAN_PRICES[preselectedPlan].toLocaleString('en-IE')}
+                          </span>
+                        </div>
+                      )}
                       <h2 className="text-2xl font-bold text-center text-gray-900 mb-7">
-                        {STEP_META[step].title}
+                        {stepMeta(step, !!preselectedPlan).title}
                       </h2>
 
                       {step === 1 && (
@@ -266,15 +288,25 @@ export default function ContactModal({ isOpen, onClose }) {
                           animate="visible"
                           className="flex flex-wrap justify-center gap-3"
                         >
-                          {PROJECT_SIZES.map((size) => (
-                            <Chip
-                              key={size.value}
-                              selected={formData.projectSize === size.value}
-                              onClick={() => handleOptionSelect('projectSize', size.value)}
-                            >
-                              {size.label}
-                            </Chip>
-                          ))}
+                          {preselectedPlan
+                            ? PROJECT_SIZES.map((size) => (
+                                <Chip
+                                  key={size.value}
+                                  selected={formData.projectSize === size.value}
+                                  onClick={() => handleOptionSelect('projectSize', size.value)}
+                                >
+                                  {size.label}
+                                </Chip>
+                              ))
+                            : PLAN_OPTIONS.map((option) => (
+                                <Chip
+                                  key={option.value}
+                                  selected={formData.plan === option.value}
+                                  onClick={() => handleOptionSelect('plan', option.value)}
+                                >
+                                  {option.label}
+                                </Chip>
+                              ))}
                         </motion.div>
                       )}
 

@@ -15,14 +15,20 @@ export function useContactModal() {
 
 export default function ContactModalProvider({ children }) {
   const [isOpen, setIsOpen] = useState(false)
+  // Plan the visitor clicked "Start Your Project" from (null = generic CTA,
+  // the modal then asks them to pick one).
+  const [preselectedPlan, setPreselectedPlan] = useState(null)
 
-  const openModal = () => setIsOpen(true)
+  const openModal = (options) => {
+    setPreselectedPlan(options?.plan ?? null)
+    setIsOpen(true)
+  }
   const closeModal = () => setIsOpen(false)
 
   return (
     <ContactModalContext.Provider value={{ isOpen, openModal, closeModal }}>
       {children}
-      <ContactModal isOpen={isOpen} onClose={closeModal} />
+      <ContactModal isOpen={isOpen} onClose={closeModal} preselectedPlan={preselectedPlan} />
     </ContactModalContext.Provider>
   )
 }

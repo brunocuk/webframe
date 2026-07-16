@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { PROJECT_TYPES, PROJECT_SIZES, labelFor } from '@/lib/inquiryOptions'
+import { PROJECT_TYPES, PROJECT_SIZES, PLAN_OPTIONS, labelFor } from '@/lib/inquiryOptions'
 
 // Inline variant of the project inquiry flow — same endpoint and questions as
 // the Start Your Project modal, plus an optional message.
@@ -38,6 +38,7 @@ export default function ContactForm() {
     email: '',
     projectType: '',
     projectSize: '',
+    plan: '',
     message: '',
     website: '', // honeypot — hidden field, real users never fill it
   })
@@ -59,6 +60,7 @@ export default function ContactForm() {
           email: form.email,
           projectType: labelFor(PROJECT_TYPES, form.projectType),
           projectSize: labelFor(PROJECT_SIZES, form.projectSize),
+          plan: form.plan === 'unsure' ? 'Not sure' : form.plan,
           message: form.message,
           website: form.website,
           source: 'contact-page',
@@ -147,6 +149,13 @@ export default function ContactForm() {
         options={PROJECT_SIZES}
         value={form.projectSize}
         onChange={set('projectSize')}
+      />
+
+      <ChipGroup
+        label="Which plan are you interested in?"
+        options={PLAN_OPTIONS}
+        value={form.plan}
+        onChange={set('plan')}
       />
 
       <div>

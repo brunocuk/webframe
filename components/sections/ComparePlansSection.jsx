@@ -109,7 +109,7 @@ export default function ComparePlansSection() {
                       or {plan.monthly}/mo for 12 months
                     </div>
                     <button
-                      onClick={openModal}
+                      onClick={() => openModal({ plan: plan.name })}
                       className={`mt-4 px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
                         plan.popular
                           ? 'bg-primary text-white hover:bg-primary-dark'

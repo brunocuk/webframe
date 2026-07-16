@@ -26,10 +26,11 @@ function CopyLink({ link }) {
   )
 }
 
-export default function QuotePanel({ leadId, quotes }) {
+export default function QuotePanel({ leadId, quotes, defaultPlan }) {
+  const initialPlan = PLAN_PRICES[defaultPlan] ? defaultPlan : 'Business'
   const [open, setOpen] = useState(false)
-  const [plan, setPlan] = useState('Business')
-  const [amount, setAmount] = useState(PLAN_PRICES.Business)
+  const [plan, setPlan] = useState(initialPlan)
+  const [amount, setAmount] = useState(PLAN_PRICES[initialPlan])
   const [mode, setMode] = useState('full')
   const [feedback, setFeedback] = useState(null)
   const [isPending, startTransition] = useTransition()

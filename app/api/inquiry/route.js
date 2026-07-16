@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
+import { sendEmail as sendViaResend } from '@/lib/email'
 
 // Receives project inquiries from the Start Your Project modal and the
 // /contact form. Fans out to three channels — webframe's own CRM table
@@ -15,6 +16,7 @@ async function storeLead(lead) {
     email: lead.email,
     project_type: lead.projectType || null,
     project_size: lead.projectSize || null,
+    plan: lead.plan || null,
     business: lead.business || null,
     message: lead.message || null,
     source: lead.source || null,
@@ -23,7 +25,24 @@ async function storeLead(lead) {
   return { ok: true }
 }
 
+// Notification email to the inbox: Resend from our own domain first (with
+// reply-to set to the lead), web3forms as a fallback channel.
 async function sendEmail(lead, summary) {
+  const subject = `New Project Inquiry: ${lead.projectType || 'Website'}${lead.plan ? ` — ${lead.plan}` : ''}`
+  try {
+    await sendViaResend({
+      to: 'hello@web-frame.eu',
+      subject,
+      replyTo: lead.email,
+      html: `<pre style="font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:1.7;color:#111827;">${summary
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')}</pre>`,
+    })
+    return { ok: true }
+  } catch (err) {
+    console.error('Resend notification failed, falling back to web3forms:', err)
+  }
+
   const key = process.env.WEB3FORMS_KEY || process.env.NEXT_PUBLIC_WEB3FORMS_KEY
   if (!key) return { skipped: true }
   const response = await fetch('https://api.web3forms.com/submit', {
@@ -31,7 +50,7 @@ async function sendEmail(lead, summary) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       access_key: key,
-      subject: `New Project Inquiry: ${lead.projectType || 'Website'}`,
+      subject,
       from_name: 'Webframe Contact Form',
       name: lead.name,
       email: lead.email,
@@ -79,6 +98,7 @@ export async function POST(request) {
     name: clip(data.name, 200),
     projectType: clip(data.projectType, 100),
     projectSize: clip(data.projectSize, 100),
+    plan: clip(data.plan, 50),
     business: clip(data.business, 300),
     message: clip(data.message, 2000),
     source: clip(data.source, 50),
@@ -88,6 +108,7 @@ export async function POST(request) {
     `New lead: ${lead.name || lead.email}\n` +
     `Email: ${lead.email}\n` +
     `Project: ${lead.projectType || '—'} · ${lead.projectSize || '—'}\n` +
+    (lead.plan ? `Plan interest: ${lead.plan}\n` : '') +
     (lead.business ? `Business: ${lead.business}\n` : '') +
     (lead.message ? `Message: ${lead.message}\n` : '') +
     `Source: ${lead.source || 'unknown'}`

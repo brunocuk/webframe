@@ -160,6 +160,11 @@ export default async function AdminLeadsPage() {
                       {lead.project_size && (
                         <div className="text-xs text-gray-500">{lead.project_size}</div>
                       )}
+                      {lead.plan && (
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-purple-50 border border-primary/20 rounded-full text-[10px] font-semibold text-primary">
+                          {lead.plan}
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-700">
                       {lead.business || '—'}
@@ -178,7 +183,11 @@ export default async function AdminLeadsPage() {
                       <StatusSelect id={lead.id} status={lead.status} />
                     </td>
                     <td className="px-5 py-4">
-                      <QuotePanel leadId={lead.id} quotes={lead.webframe_quotes} />
+                      <QuotePanel
+                        leadId={lead.id}
+                        quotes={lead.webframe_quotes}
+                        defaultPlan={lead.plan}
+                      />
                     </td>
                     <td className="px-5 py-4">
                       <ProjectPanel
