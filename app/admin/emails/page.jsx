@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {
+  confirmationEmailHtml,
   quoteEmailHtml,
   quoteReminderEmailHtml,
   onboardingEmailHtml,
@@ -16,6 +17,11 @@ export const metadata = {
 // Every transactional email the system sends, rendered with sample data.
 export default function EmailPreviewsPage() {
   const samples = [
+    {
+      title: 'Inquiry confirmation',
+      note: 'Auto-sent to the visitor the moment their form lands.',
+      html: confirmationEmailHtml({ name: 'Anna de Vries' }),
+    },
     {
       title: 'Quote — full payment',
       note: 'Sent when you click "Create & send" with Full amount.',

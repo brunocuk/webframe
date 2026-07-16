@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
-import { sendEmail as sendViaResend } from '@/lib/email'
+import { sendEmail as sendViaResend, confirmationEmailHtml } from '@/lib/email'
 
 // Receives project inquiries from the Start Your Project modal and the
 // /contact form. Fans out to three channels — webframe's own CRM table
@@ -133,6 +133,17 @@ export async function POST(request) {
       { success: false, error: 'Could not deliver your message' },
       { status: 502 }
     )
+  }
+
+  // Best-effort auto-confirmation to the visitor — never affects the result.
+  try {
+    await sendViaResend({
+      to: lead.email,
+      subject: "Got your brief — you'll hear from me within 24 hours",
+      html: confirmationEmailHtml({ name: lead.name }),
+    })
+  } catch (err) {
+    console.error('Confirmation email failed:', err)
   }
 
   return NextResponse.json({ success: true })
