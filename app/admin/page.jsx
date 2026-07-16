@@ -149,6 +149,12 @@ export default async function AdminLeadsPage({ searchParams }) {
             </div>
             <div className="flex items-center gap-2">
               <AddLead />
+              <Link
+                href="/admin/emails"
+                className="px-4 py-2 rounded-full border border-gray-200 bg-white text-xs font-medium text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
+              >
+                Emails
+              </Link>
               <form action={logout}>
                 <button
                   type="submit"
