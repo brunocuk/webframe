@@ -12,6 +12,7 @@ export default function Footer() {
     { label: 'Pricing', href: '/pricing' },
     { label: 'FAQ', href: '/#faq' },
     { label: 'Contact', href: '/contact' },
+    { label: 'Client login', href: '/portal' },
   ]
 
   // Icons render only once a real profile URL replaces '#'

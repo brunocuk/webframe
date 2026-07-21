@@ -36,12 +36,10 @@ export default function QuotePanel({ leadId, quotes, defaultPlan, readOnly = fal
   const [isPending, startTransition] = useTransition()
 
   const latest = quotes?.[0]
-  // A paid full/balance quote ends the money flow; a paid deposit needs a
-  // follow-up balance quote later.
+  // A paid full/balance quote ends the money flow. Deposits are no longer
+  // offered, but a legacy paid deposit still needs its balance collected.
   const showNewQuoteButton =
     !latest || latest.status === 'cancelled' || (latest.status === 'paid' && latest.payment_mode === 'deposit')
-
-  const effectiveAmount = mode === 'deposit' ? Math.round(amount / 2) : amount
 
   const pickMode = (nextMode) => {
     setMode(nextMode)
@@ -53,15 +51,11 @@ export default function QuotePanel({ leadId, quotes, defaultPlan, readOnly = fal
     startTransition(async () => {
       const result = await createAndSendQuote(leadId, {
         plan,
-        amountEur: effectiveAmount,
+        amountEur: amount,
         paymentMode:
-          mode === 'monthly'
-            ? 'monthly'
-            : mode === 'full'
-              ? 'full'
-              : latest?.payment_mode === 'deposit'
-                ? 'balance'
-                : 'deposit',
+          latest?.payment_mode === 'deposit' && latest?.status === 'paid'
+            ? 'balance'
+            : mode,
       })
       if (result?.error) setFeedback({ type: 'error', text: result.error })
       else {
@@ -145,7 +139,6 @@ export default function QuotePanel({ leadId, quotes, defaultPlan, readOnly = fal
             <div className="flex gap-1.5">
               {[
                 { value: 'full', label: 'Full' },
-                { value: 'deposit', label: '50% dep.' },
                 { value: 'monthly', label: 'Monthly' },
               ].map((option) => (
                 <button
@@ -166,7 +159,7 @@ export default function QuotePanel({ leadId, quotes, defaultPlan, readOnly = fal
           <div className="text-[11px] text-gray-500">
             Will charge:{' '}
             <span className="font-bold text-gray-900">
-              €{effectiveAmount.toLocaleString('en-IE')}
+              €{amount.toLocaleString('en-IE')}
               {mode === 'monthly' ? '/mo' : ''}
             </span>
           </div>

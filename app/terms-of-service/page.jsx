@@ -76,16 +76,15 @@ export default function TermsOfServicePage() {
                 For upfront payments:
               </p>
               <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
-                <li><strong>Deposit:</strong> 50% of total price paid before work begins</li>
-                <li><strong>Final payment:</strong> 50% paid after project completion and before launch</li>
+                <li><strong>Payment:</strong> the full price is paid before work begins and books your build week</li>
                 <li><strong>Payment methods:</strong> Bank transfer, credit card</li>
               </ul>
 
               <h3 className="text-xl font-bold mb-3 text-gray-900">4.3 Refund Policy</h3>
               <p className="text-gray-700 leading-relaxed mb-4">
-                We offer a 100% refund of the deposit if you cancel within the first 14 days of the project,
+                We offer a 100% refund if you cancel within the first 14 days of the project,
                 provided we have not started development. Once development has begun,
-                the deposit is non-refundable, but you can request up to 2 rounds of revisions.
+                the payment is non-refundable, but you can request up to 2 rounds of revisions.
               </p>
             </section>
 
@@ -252,7 +251,7 @@ export default function TermsOfServicePage() {
                 You can terminate the contract at any time. However:
               </p>
               <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
-                <li>The deposit is non-refundable if work has begun</li>
+                <li>The payment is non-refundable if work has begun</li>
                 <li>We will invoice for work completed up to that point</li>
                 <li>Source code is only delivered after final payment</li>
               </ul>

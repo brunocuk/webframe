@@ -3,12 +3,11 @@ import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
 import { getAdminRole } from '@/lib/adminRole'
 import { LEAD_STATUSES } from '@/lib/inquiryOptions'
 import { UPLOADS_BUCKET } from '@/lib/portal'
-import StatusSelect from './StatusSelect'
-import QuotePanel from './QuotePanel'
-import ProjectPanel from './ProjectPanel'
-import AddLead from './AddLead'
-import CallTime from './CallTime'
-import { logout } from './login/actions'
+import StatusSelect from '@/app/admin/StatusSelect'
+import QuotePanel from '@/app/admin/QuotePanel'
+import ProjectPanel from '@/app/admin/ProjectPanel'
+import AddLead from '@/app/admin/AddLead'
+import CallTime from '@/app/admin/CallTime'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,7 +54,7 @@ export default async function AdminLeadsPage({ searchParams }) {
     if (status) params.set('status', status)
     if (source) params.set('source', source)
     const qs = params.toString()
-    return qs ? `/admin?${qs}` : '/admin'
+    return qs ? `/admin/leads?${qs}` : '/admin/leads'
   }
 
   const supabase = getSupabaseAdmin()
@@ -129,42 +128,18 @@ export default async function AdminLeadsPage({ searchParams }) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+    <>
         {/* Header */}
-        <div className="mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-1">
-            <div>
-              <div className="font-mono text-xs font-semibold tracking-wider text-primary mb-1.5">
-                // webframe crm
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
-                Leads
-                {!isOwner && (
-                  <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-full text-[11px] font-semibold text-amber-700">
-                    sales access
-                  </span>
-                )}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <AddLead />
-              <Link
-                href="/admin/emails"
-                className="px-4 py-2 rounded-full border border-gray-200 bg-white text-xs font-medium text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
-              >
-                Emails
-              </Link>
-              <form action={logout}>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-full border border-gray-200 bg-white text-xs font-medium text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
-                >
-                  Log out
-                </button>
-              </form>
-            </div>
-          </div>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
+            Leads
+            {!isOwner && (
+              <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-full text-[11px] font-semibold text-amber-700">
+                sales access
+              </span>
+            )}
+          </h1>
+          <AddLead />
         </div>
 
         {/* Pipeline + source filters */}
@@ -355,7 +330,6 @@ export default async function AdminLeadsPage({ searchParams }) {
             </div>
           ))}
         </div>
-      </div>
-    </main>
+    </>
   )
 }

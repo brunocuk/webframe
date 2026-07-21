@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import {
   confirmationEmailHtml,
   quoteEmailHtml,
@@ -34,19 +33,8 @@ export default function EmailPreviewsPage() {
       }),
     },
     {
-      title: 'Quote — 50% deposit',
-      note: 'Deposit mode; the balance email follows before launch.',
-      html: quoteEmailHtml({
-        name: 'Anna de Vries',
-        plan: 'Business',
-        amountEur: 1200,
-        paymentMode: 'deposit',
-        paymentLink: '#',
-      }),
-    },
-    {
       title: 'Quote — final balance',
-      note: 'Sent via "Request balance" after a paid deposit.',
+      note: 'Legacy: only for completing old 50/50 quotes via "Request balance".',
       html: quoteEmailHtml({
         name: 'Anna de Vries',
         plan: 'Business',
@@ -95,21 +83,9 @@ export default function EmailPreviewsPage() {
   ]
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="max-w-6xl mx-auto">
+    <>
         <div className="mb-8">
-          <div className="font-mono text-xs font-semibold tracking-wider text-primary mb-1.5">
-            // webframe crm
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Email previews</h1>
-            <Link
-              href="/admin"
-              className="px-4 py-2 rounded-full border border-gray-200 bg-white text-xs font-medium text-gray-500 hover:text-gray-900 hover:border-gray-400 transition-colors"
-            >
-              ← Back to leads
-            </Link>
-          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Email previews</h1>
           <p className="text-sm text-gray-600 mt-2">
             Rendered with sample data — exactly what clients receive. Copy lives
             in <code className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">lib/email.js</code>.
@@ -132,7 +108,6 @@ export default function EmailPreviewsPage() {
             </div>
           ))}
         </div>
-      </div>
-    </main>
+    </>
   )
 }

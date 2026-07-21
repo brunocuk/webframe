@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { createPortalForLead, updateProjectStage } from './actions'
 import { PROJECT_STAGES } from '@/lib/projectStages'
+import { isItemDone } from '@/lib/contentItems'
 
 function CopyButton({ getText, label }) {
   const [copied, setCopied] = useState(false)
@@ -48,8 +49,9 @@ export default function ProjectPanel({ lead, project, fileLinks, readOnly = fals
   }
 
   const items = project.webframe_content_items || []
-  const uploadedCount = items.filter((i) => (i.files || []).length > 0).length
+  const doneCount = items.filter(isItemDone).length
   const totalFiles = items.reduce((n, i) => n + (i.files || []).length, 0)
+  const noteCount = items.filter((i) => i.note?.trim()).length
 
   return (
     <div className="space-y-1.5 min-w-[170px]">
@@ -80,12 +82,13 @@ export default function ProjectPanel({ lead, project, fileLinks, readOnly = fals
           getText={() => `${window.location.origin}/portal/${project.portal_token}`}
           label="Copy portal link"
         />
-        {totalFiles > 0 && (
+        {(totalFiles > 0 || noteCount > 0) && (
           <button
             onClick={() => setShowFiles((v) => !v)}
             className="text-[11px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
           >
-            {uploadedCount}/{items.length} in · {totalFiles} file{totalFiles === 1 ? '' : 's'} {showFiles ? '▴' : '▾'}
+            {doneCount}/{items.length} in · {totalFiles} file{totalFiles === 1 ? '' : 's'}
+            {noteCount > 0 ? ` · ${noteCount} note${noteCount === 1 ? '' : 's'}` : ''} {showFiles ? '▴' : '▾'}
           </button>
         )}
       </div>
@@ -114,6 +117,24 @@ export default function ProjectPanel({ lead, project, fileLinks, readOnly = fals
               )
             })
           )}
+          {items
+            .filter((item) => item.note?.trim())
+            .map((item) => (
+              <li key={`${item.id}-note`} className="text-[11px] max-w-[220px]">
+                <span className="text-gray-400">{item.label}:</span>{' '}
+                <span className="text-gray-600 italic" title={item.note}>
+                  &ldquo;{item.note.trim().slice(0, 80)}
+                  {item.note.trim().length > 80 ? '…' : ''}&rdquo;
+                </span>
+              </li>
+            ))}
+          {items
+            .filter((item) => item.skipped && !(item.files || []).length && !item.note?.trim())
+            .map((item) => (
+              <li key={`${item.id}-skip`} className="text-[11px] text-gray-400 max-w-[220px]">
+                {item.label}: skipped by client
+              </li>
+            ))}
         </ul>
       )}
     </div>

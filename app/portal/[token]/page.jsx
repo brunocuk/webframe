@@ -1,38 +1,31 @@
+import Link from 'next/link'
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin'
-import { PROJECT_STAGES } from '@/lib/portal'
-import UploadItem from './UploadItem'
+import { isItemDone } from '@/lib/contentItems'
+import { buildDeadline, supportEnds, formatDateLong } from '@/lib/projectTime'
+import InvalidLink from './InvalidLink'
+import StageTimeline from './StageTimeline'
+import Countdown from './Countdown'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata = {
-  title: 'Your Project - Webframe',
-  robots: { index: false, follow: false },
-}
-
-function InvalidLink() {
+function StatCard({ href, label, value, detail, done }) {
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
-      <div className="max-w-md text-center">
-        <div className="font-mono text-xs font-semibold tracking-wider text-primary mb-3">
-          // client portal
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">
-          This link isn&apos;t valid.
-        </h1>
-        <p className="text-gray-600 text-sm leading-relaxed">
-          The portal link may have been copied incompletely. Check the link in
-          your onboarding email, or write to{' '}
-          <a href="mailto:hello@web-frame.eu" className="text-primary font-semibold">
-            hello@web-frame.eu
-          </a>{' '}
-          and we&apos;ll sort it out.
-        </p>
+    <Link
+      href={href}
+      className={`block bg-white rounded-2xl border p-5 transition-colors hover:border-gray-400 ${
+        done ? 'border-green-200' : 'border-gray-200'
+      }`}
+    >
+      <div className="font-mono text-[10px] tracking-wider text-gray-400 uppercase mb-2">
+        {label}
       </div>
-    </main>
+      <div className="text-lg font-bold text-gray-900">{value}</div>
+      <div className="text-xs text-gray-500 mt-0.5">{detail}</div>
+    </Link>
   )
 }
 
-export default async function PortalPage({ params }) {
+export default async function PortalOverviewPage({ params }) {
   const { token } = await params
   const supabase = getSupabaseAdmin()
   if (!supabase) return <InvalidLink />
@@ -44,97 +37,134 @@ export default async function PortalPage({ params }) {
     .maybeSingle()
   if (!project) return <InvalidLink />
 
-  const items = (project.webframe_content_items || []).sort(
-    (a, b) => new Date(a.created_at) - new Date(b.created_at)
-  )
-  const stageIndex = Math.max(
-    PROJECT_STAGES.findIndex((s) => s.value === project.stage),
-    0
-  )
-  const currentStage = PROJECT_STAGES[stageIndex]
-  const progress = ((stageIndex + 1) / PROJECT_STAGES.length) * 100
+  const items = project.webframe_content_items || []
+  const doneItems = items.filter(isItemDone).length
+
+  const [{ data: quotes }, { count: openTickets }] = await Promise.all([
+    supabase
+      .from('webframe_quotes')
+      .select('amount_eur, status')
+      .eq('lead_id', project.lead_id),
+    supabase
+      .from('webframe_tickets')
+      .select('id', { count: 'exact', head: true })
+      .eq('project_id', project.id)
+      .eq('status', 'open'),
+  ])
+  const unpaid = (quotes || []).filter((q) => q.status === 'sent')
+  const unpaidTotal = unpaid.reduce((sum, q) => sum + (Number(q.amount_eur) || 0), 0)
+
+  const deadline = buildDeadline(project)
+  const supportUntil = supportEnds(project)
+  const base = `/portal/${token}`
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50/30 px-6 py-16 md:py-20">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-bold tracking-tight text-gray-900">
-              webframe
-            </span>
-            <span className="font-mono text-xs text-gray-400">// client portal</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-2">
-            {project.name}
-          </h1>
-          <p className="text-gray-600">
-            Hand-coded and live within 7 days of your content — here&apos;s
-            where things stand.
-          </p>
-        </div>
-
-        {/* Stage timeline — echoes the 7-day rail on the homepage */}
-        <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 md:p-8 mb-10">
-          <div className="relative h-1.5 bg-gray-200 rounded-full overflow-hidden mb-5">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-700"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {PROJECT_STAGES.map((stage, i) => (
-              <div key={stage.value} className={i > stageIndex ? 'opacity-40' : ''}>
-                <div className="flex items-center gap-1.5 mb-1">
-                  {i < stageIndex ? (
-                    <svg className="w-4 h-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                  ) : (
-                    <span
-                      className={`w-2 h-2 rounded-full ${
-                        i === stageIndex ? 'bg-primary animate-pulse' : 'bg-gray-300'
-                      }`}
-                    />
-                  )}
-                  <span
-                    className={`text-sm font-semibold ${
-                      i === stageIndex ? 'text-primary' : 'text-gray-900'
-                    }`}
-                  >
-                    {stage.label}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 leading-relaxed">{stage.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Content checklist */}
-        <div className="mb-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Your content</h2>
-          <p className="text-sm text-gray-600">
-            {project.stage === 'content'
-              ? 'Upload everything below — rough is fine, we polish. The 7-day clock starts once your content is in.'
-              : 'Content received — you can still add files if something changes.'}
-          </p>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4 mb-12">
-          {items.map((item) => (
-            <UploadItem key={item.id} token={token} item={item} />
-          ))}
-        </div>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-gray-500">
-          Questions? Write to{' '}
-          <a href="mailto:hello@web-frame.eu" className="text-primary font-semibold">
-            hello@web-frame.eu
-          </a>{' '}
-          — you&apos;ll hear back within 24 hours.
+    <>
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-2">
+          {project.name}
+        </h1>
+        <p className="text-gray-600">
+          Hand-coded and live within 7 days of your content — here&apos;s where
+          things stand.
         </p>
       </div>
-    </main>
+
+      <div className="mb-6">
+        <StageTimeline stage={project.stage} />
+      </div>
+
+      {/* Stage-specific callout */}
+      {project.stage === 'content' && (
+        <div className="bg-purple-50 border border-primary/20 rounded-3xl p-6 md:p-8 mb-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">
+            We&apos;re waiting on your content
+          </h3>
+          <p className="text-sm text-gray-600 leading-relaxed mb-4">
+            {doneItems} of {items.length} items are in. The 7-day build starts
+            the moment the rest lands — rough is fine, we polish.
+          </p>
+          <Link
+            href={`${base}/content`}
+            className="inline-block px-6 py-2.5 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors"
+          >
+            Upload your content
+          </Link>
+        </div>
+      )}
+
+      {(project.stage === 'build' || project.stage === 'review') && deadline && (
+        <div className="bg-white border border-gray-200 rounded-3xl shadow-sm p-6 md:p-8 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="font-mono text-[10px] tracking-wider text-gray-400 uppercase mb-1">
+                7-day build
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">
+                On track to be live by {formatDateLong(deadline)}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {project.stage === 'review'
+                  ? 'Your preview is ready — check Support for the link, or reply to our email with tweaks.'
+                  : 'We&#39;re designing and coding your site right now. You&#39;ll get a preview link before launch.'}
+              </p>
+            </div>
+            <Countdown deadline={deadline.toISOString()} className="text-2xl font-bold" />
+          </div>
+        </div>
+      )}
+
+      {project.stage === 'live' && (
+        <div className="bg-green-50 border border-green-200 rounded-3xl p-6 md:p-8 mb-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">
+            Your site is live 🎉
+          </h3>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            {supportUntil ? (
+              <>
+                Free support runs until{' '}
+                <strong className="text-gray-900">{formatDateLong(supportUntil)}</strong>{' '}
+                — spot anything off, open a ticket and we&apos;ll fix it.
+              </>
+            ) : (
+              <>Spot anything off? Open a support ticket and we&apos;ll fix it.</>
+            )}
+          </p>
+        </div>
+      )}
+
+      {/* Quick links */}
+      <div className="grid sm:grid-cols-3 gap-4">
+        <StatCard
+          href={`${base}/content`}
+          label="content"
+          value={`${doneItems}/${items.length} in`}
+          detail={doneItems === items.length ? 'All received — thank you!' : 'Uploads, notes, or skip'}
+          done={items.length > 0 && doneItems === items.length}
+        />
+        <StatCard
+          href={`${base}/invoices`}
+          label="invoices"
+          value={
+            unpaid.length > 0
+              ? `€${unpaidTotal.toLocaleString('en-IE')} due`
+              : 'All settled'
+          }
+          detail={
+            unpaid.length > 0
+              ? `${unpaid.length} open payment${unpaid.length === 1 ? '' : 's'}`
+              : 'Payment history & receipts'
+          }
+          done={unpaid.length === 0 && (quotes || []).length > 0}
+        />
+        <StatCard
+          href={`${base}/support`}
+          label="support"
+          value={openTickets > 0 ? `${openTickets} open` : 'No open tickets'}
+          detail="Questions, tweaks, ideas"
+          done={false}
+        />
+      </div>
+    </>
   )
 }
